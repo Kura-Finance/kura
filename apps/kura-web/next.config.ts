@@ -19,7 +19,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "www.google.com", // 💡 換成 Google Favicon API 網域      
-        },
+      },
+      {
+        protocol: "https",
+        hostname: "assets.coingecko.com",
+      },
     ],
   },
 };

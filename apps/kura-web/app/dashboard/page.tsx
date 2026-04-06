@@ -6,27 +6,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AccountCarousel from './_components/AccountCarousel';
 import TransactionsModal from './_components/TransactionsModal';
 import { useFinanceStore } from '../store/useFinanceStore';
-
-interface ChatMessage {
-  id: string;
-  role: 'ai' | 'user';
-  content: string;
-}
+import { useAppStore } from '@/store/useAppStore';
+import ConnectAccountModal from '@/components/ConnectAccountModal';
 
 export default function DashboardPage() {
   const accounts = useFinanceStore(state => state.accounts);
   const transactions = useFinanceStore(state => state.transactions);
   const isAiEnabled = useFinanceStore(state => state.isAiOptedIn);
   const toggleAiOptIn = useFinanceStore(state => state.toggleAiOptIn);
+  const aiInsights = useAppStore(state => state.aiInsights);
+  const messages = useAppStore(state => state.chatMessages);
+  const addChatMessage = useAppStore(state => state.addChatMessage);
 
   const [selectedAccountId, setSelectedAccountId] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: 'msg-1', role: 'ai', content: 'Hi! I noticed your dining expenses are up this week. Do you want me to analyze your recent Uber Eats orders?' }
-  ]);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -56,24 +53,29 @@ export default function DashboardPage() {
     e.preventDefault();
     if (!inputText.trim()) return;
 
-    const newUserMsg: ChatMessage = { id: Date.now().toString(), role: 'user', content: inputText };
-    setMessages(prev => [...prev, newUserMsg]);
+    const newUserMsg = { id: Date.now().toString(), role: 'user' as const, content: inputText };
+    addChatMessage(newUserMsg);
     setInputText('');
     setIsTyping(true);
 
     setTimeout(() => {
-      const newAiMsg: ChatMessage = { 
+      const newAiMsg = {
         id: (Date.now() + 1).toString(), 
-        role: 'ai', 
+        role: 'ai' as const,
         content: 'I can certainly help with that. Based on your current balance, shifting $500 to your Marcus Savings will optimize your APY without risking overdrafts.' 
       };
-      setMessages(prev => [...prev, newAiMsg]);
+      addChatMessage(newAiMsg);
       setIsTyping(false);
     }, 1500);
   };
 
   return (
     <div className="max-w-6xl mx-auto pb-10">
+      <ConnectAccountModal
+        isOpen={isConnectModalOpen}
+        onClose={() => setIsConnectModalOpen(false)}
+      />
+
       <div className="mb-4">
         <h1 className="text-3xl font-bold text-white">Dashboard</h1>
         <p className="text-gray-400 mt-1">Here is the summary of your fiat assets.</p>
@@ -83,7 +85,8 @@ export default function DashboardPage() {
         accounts={accounts}
         totalBalance={totalBalance}
         selectedId={selectedAccountId}
-        onAccountSelect={(id) => setSelectedAccountId(id)} 
+        onAccountSelect={(id) => setSelectedAccountId(id)}
+        onConnectAccount={() => setIsConnectModalOpen(true)}
       />
 
       <div className="mt-4">
@@ -172,15 +175,15 @@ export default function DashboardPage() {
                       <h3 className="text-lg font-bold text-white">AI Analysis</h3>
                     </div>
                     <div className="space-y-6 relative z-10 flex-1 overflow-y-auto pr-2 hide-scrollbar">
-                      <div>
-                        <div className="text-xs text-[#A78BFA] font-bold uppercase tracking-wider mb-2">Spending Alert</div>
-                        <p className="text-sm text-gray-300 leading-relaxed">You spent <span className="text-white font-bold">$169.50</span> on Dining this week, which is <span className="text-red-400">15% higher</span> than your usual average.</p>
-                      </div>
-                      <div className="h-px w-full bg-white/5" />
-                      <div>
-                        <div className="text-xs text-[#A78BFA] font-bold uppercase tracking-wider mb-2">Optimization</div>
-                        <p className="text-sm text-gray-300 leading-relaxed">Consider moving $2,000 from your <span className="text-white">BofA Checking</span> to <span className="text-white">Marcus Savings</span> to earn an extra ~$8.50 this month in interest.</p>
-                      </div>
+                      {aiInsights.map((insight, index) => (
+                        <React.Fragment key={insight.id}>
+                          <div>
+                            <div className="text-xs text-[#A78BFA] font-bold uppercase tracking-wider mb-2">{insight.title}</div>
+                            <p className="text-sm text-gray-300 leading-relaxed">{insight.content}</p>
+                          </div>
+                          {index < aiInsights.length - 1 && <div className="h-px w-full bg-white/5" />}
+                        </React.Fragment>
+                      ))}
                     </div>
                     <button onClick={() => setIsChatOpen(true)} className="w-full mt-6 py-3.5 rounded-xl bg-[#8B5CF6]/10 text-[#A78BFA] text-sm font-medium hover:bg-[#8B5CF6]/20 transition-colors border border-[#8B5CF6]/30 relative z-10 shrink-0">
                       Ask Kura AI

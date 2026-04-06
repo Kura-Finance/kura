@@ -1,42 +1,73 @@
 // src/app/dashboard/_components/Sidebar.tsx
+"use client";
+
 import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function Sidebar() {
+  const pathname = usePathname() || '';
+
+  // 判斷當前路由以切換高亮狀態
+  const isBanking = pathname === '/dashboard';
+  const isInvestment = pathname.includes('/dashboard/investment');
+  const isBudget = pathname.includes('/dashboard/budget');
+
   return (
-    /* 1. group: 將整個 nav 設為一個群組，讓裡面的文字可以監聽外層的 hover 狀態
-      2. w-20 -> hover:w-56: 預設寬度縮窄到 80px，滑鼠移入時展開到 224px
-      3. overflow-hidden: 確保收起時，文字不會超出邊界爆掉
-      4. transition-all duration-300: 展開/收起時的滑順動畫
-    */
-    <nav className="relative z-10 group w-20 hover:w-56 border-r border-[#1A1A24] bg-[#0B0B0F] py-6 px-3 flex flex-col gap-2 shrink-0 transition-all duration-300 ease-in-out overflow-hidden">
+    <nav className="relative z-10 group w-20 hover:w-56 border-r border-[#1A1A24] bg-[#0B0B0F] py-6 px-3 flex flex-col gap-2 shrink-0 transition-all duration-300 ease-in-out overflow-hidden h-full">
       
-      <button className="flex items-center p-3 rounded-xl bg-[#8B5CF6]/10 text-[#8B5CF6] transition-colors w-full relative">
+      {/* 1. Banking (首頁) */}
+      <Link 
+        href="/dashboard"
+        className={`flex items-center p-3 rounded-xl transition-colors w-full relative ${
+          isBanking 
+            ? 'bg-[#8B5CF6]/10 text-[#8B5CF6]' 
+            : 'text-gray-400 hover:bg-[#1A1A24] hover:text-white'
+        }`}
+      >
         <div className="w-8 flex justify-center items-center shrink-0">
           <span className="text-xl">🏦</span>
         </div>
         <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           Banking
         </span>
-      </button>
+      </Link>
 
-      <button className="flex items-center p-3 rounded-xl text-gray-400 hover:bg-[#1A1A24] hover:text-white transition-colors w-full relative">
+      {/* 2. Investment (投資組合) */}
+      <Link 
+        href="/dashboard/investment"
+        className={`flex items-center p-3 rounded-xl transition-colors w-full relative ${
+          isInvestment 
+            ? 'bg-[#8B5CF6]/10 text-[#8B5CF6]' 
+            : 'text-gray-400 hover:bg-[#1A1A24] hover:text-white'
+        }`}
+      >
         <div className="w-8 flex justify-center items-center shrink-0">
           <span className="text-xl">📈</span>
         </div>
         <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           Investment
         </span>
-      </button>
+      </Link>
 
-      <button className="flex items-center p-3 rounded-xl text-gray-400 hover:bg-[#1A1A24] hover:text-white transition-colors w-full relative">
+      {/* 3. Budget (預算規劃 - 預留) */}
+      <Link 
+        href="/dashboard/budget"
+        className={`flex items-center p-3 rounded-xl transition-colors w-full relative ${
+          isBudget 
+            ? 'bg-[#8B5CF6]/10 text-[#8B5CF6]' 
+            : 'text-gray-400 hover:bg-[#1A1A24] hover:text-white'
+        }`}
+      >
         <div className="w-8 flex justify-center items-center shrink-0">
           <span className="text-xl">👛</span>
         </div>
         <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           Budget
         </span>
-      </button>
+      </Link>
 
+      {/* Kura AI (底部懸浮) */}
       <button className="flex items-center p-3 rounded-xl text-gray-400 hover:bg-[#1A1A24] hover:text-white transition-colors w-full relative mt-auto border border-transparent hover:border-[#1A1A24]">
         <div className="w-8 flex justify-center items-center shrink-0">
           <span className="text-xl text-[#A78BFA]">✨</span>

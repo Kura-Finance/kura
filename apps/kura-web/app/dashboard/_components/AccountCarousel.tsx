@@ -7,9 +7,10 @@ interface AccountCarouselProps {
   totalBalance: number;
   selectedId: string;
   onAccountSelect: (id: string) => void;
+  onConnectAccount: () => void;
 }
 
-export default function AccountCarousel({ accounts, totalBalance, selectedId, onAccountSelect }: AccountCarouselProps) {
+export default function AccountCarousel({ accounts, totalBalance, selectedId, onAccountSelect, onConnectAccount }: AccountCarouselProps) {
   const formattedTotal = `$${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 
   return (
@@ -92,7 +93,10 @@ export default function AccountCarousel({ accounts, totalBalance, selectedId, on
         })}
 
         {/* Plaid 連結按鈕 */}
-        <button className="snap-start shrink-0 w-[320px] h-[180px] rounded-3xl border-2 border-dashed border-[#1A1A24] bg-[#0B0B0F]/50 flex flex-col items-center justify-center transition-all duration-150 hover:border-[#8B5CF6] hover:bg-[#8B5CF6]/5 group cursor-pointer ml-6 z-0">
+        <button
+          onClick={onConnectAccount}
+          className="snap-start shrink-0 w-[320px] h-[180px] rounded-3xl border-2 border-dashed border-[#1A1A24] bg-[#0B0B0F]/50 flex flex-col items-center justify-center transition-all duration-150 hover:border-[#8B5CF6] hover:bg-[#8B5CF6]/5 group cursor-pointer ml-6 z-0"
+        >
           <div className="w-14 h-14 rounded-full bg-[#1A1A24] flex items-center justify-center mb-4 group-hover:scale-110 transition-all duration-150 overflow-hidden">
             <Image src="https://www.google.com/s2/favicons?domain=plaid.com&sz=128" alt="Plaid Logo" width={36} height={36} className="object-contain opacity-40 group-hover:opacity-100 transition-opacity" />
           </div>
