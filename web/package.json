@@ -7,12 +7,14 @@
     "cert:gen": "bash ./scripts/generate-local-cert.sh",
     "build": "next build",
     "build:prod": "NODE_ENV=production next build",
-    "build:standalone": "next build && du -sh .next/standalone",
+    "build:static": "BUILD_MODE=export next build && du -sh out",
+    "build:standalone": "BUILD_MODE=standalone next build && du -sh .next/standalone",
     "start": "next start",
     "start:standalone": "node .next/standalone/server.js",
     "deploy": "bash ./scripts/deploy.sh",
     "deploy:preview": "npm run build && firebase hosting:channel:deploy preview --project kura-b39eb",
-    "deploy:cloud-run": "npm run build && gcloud run deploy kura-web --source . --project kura-b39eb --region us-central1 --allow-unauthenticated",
+    "deploy:static": "npm run build:static && firebase deploy --only hosting --project kura-b39eb",
+    "deploy:cloud-run": "npm run build:standalone && gcloud run deploy kura-web --source . --project kura-b39eb --region us-central1 --allow-unauthenticated",
     "lint": "eslint"
   },
   "dependencies": {

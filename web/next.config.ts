@@ -1,18 +1,48 @@
 import type { NextConfig } from "next";
 import path from "path";
 
+/**
+ * Build Mode Configuration
+ * 
+ * Set BUILD_MODE environment variable to choose output:
+ * - 'standalone': Dynamic server app (default)
+ *   npm run build
+ * 
+ * - 'export': Static HTML/CSS/JS (for CDN)
+ *   BUILD_MODE=export npm run build
+ */
+const BUILD_MODE = process.env.BUILD_MODE || 'standalone';
+
 const nextConfig: NextConfig = {
-  // ✅ Standalone output: Create a self-contained build without node_modules
-  // Perfect for Docker/Cloud Run deployment
-  output: 'standalone',
+  // Dynamic or static output based on BUILD_MODE
+  ...(BUILD_MODE === 'export' ? {
+    output: 'export',
+    trailingSlash: true,
+  } : {
+    output: 'standalone',
+  }),
   
-  /* config options here */
-  // ✅ HTTPS handling:
-  // - Development: npm run dev uses --experimental-https flag (see package.json)
-  // - Production: Firebase Hosting provides HTTPS (app runs on HTTP)
   turbopack: {
     root: path.join(__dirname),
   },
+  
+  /**
+   * Rewrites for API routes
+   * Forwards /api/* requests to backend server
+   * - Dev: http://localhost:8080 (from .env.local)
+   * - Prod: Firebase Cloud Functions (from firebase.json)
+   */
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/api/:path*',
+          destination: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}/api/:path*`,
+        },
+      ],
+    };
+  },
+  
   async headers() {
     return [
       {
