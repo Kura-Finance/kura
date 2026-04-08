@@ -9,6 +9,9 @@
       },
       "ios": {
         "image": "default"
+      },
+      "env": {
+        "EXPO_PUBLIC_WALLETCONNECT_PROJECT_ID": "@WALLETCONNECT_PROJECT_ID"
       }
     },
     "release": {
@@ -17,6 +20,9 @@
       },
       "ios": {
         "image": "default"
+      },
+      "env": {
+        "EXPO_PUBLIC_WALLETCONNECT_PROJECT_ID": "@WALLETCONNECT_PROJECT_ID"
       }
     }
   }

@@ -56,6 +56,7 @@ interface AppState {
   aiInsights: AiInsight[];
   chatMessages: AppChatMessage[];
   plaidLinkToken: string | null;
+  plaidLinkTokenTimestamp: number | null;
   authToken: string | null;
   authError: string | null;
 
@@ -106,6 +107,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   aiInsights: [],
   chatMessages: [],
   plaidLinkToken: null,
+  plaidLinkTokenTimestamp: null,
   authToken: null,
   authError: null,
 
@@ -260,6 +262,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           membershipLabel: '',
         },
         plaidLinkToken: null,
+        plaidLinkTokenTimestamp: null,
         authError: null,
       });
 
@@ -537,8 +540,10 @@ export const useAppStore = create<AppState>((set, get) => ({
         throw new Error('No link token returned from backend');
       }
       
-      set({ plaidLinkToken: token });
-      Logger.info('AppStore', 'Plaid link token received', { token });
+      // 保存 token 和生成时间戳（用于检测过期）
+      const now = Date.now();
+      set({ plaidLinkToken: token, plaidLinkTokenTimestamp: now });
+      Logger.info('AppStore', 'Plaid link token received', { token: token.substring(0, 20) + '...', timestamp: new Date(now).toISOString() });
       return token;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to get Plaid link token';
@@ -573,8 +578,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       const recordAssetSnapshot = useFinanceStore.getState().recordAssetSnapshot;
       recordAssetSnapshot();
 
-      // Clear the link token
-      set({ plaidLinkToken: null });
+      // Clear the link token and timestamp
+      set({ plaidLinkToken: null, plaidLinkTokenTimestamp: null });
       Logger.info('AppStore', 'Finance data reloaded and asset snapshot recorded after Plaid exchange');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to exchange Plaid token';

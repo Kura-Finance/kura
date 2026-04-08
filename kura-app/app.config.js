@@ -27,6 +27,8 @@ module.exports = {
       supportsTablet: true,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
+        NSLocalNetworkUsageDescription: "This app needs access to your local network to connect to financial services",
+        NSBonjourServiceTypes: ["_http._tcp", "_https._tcp"],
       },
     },
     android: {

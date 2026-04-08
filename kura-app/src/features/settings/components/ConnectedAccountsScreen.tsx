@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFinanceStore } from '../../../shared/store/useFinanceStore';
+import { useAppStore } from '../../../shared/store/useAppStore';
 import ConnectAccountModal from '../../../shared/components/ConnectAccountModal';
+import PlaidLinkModal from '../../../shared/components/PlaidLinkModal';
+import AppKitWalletModal from '../../../shared/components/AppKitWalletModal';
 
 interface ConnectedAccountsScreenProps {
   onClose: () => void;
@@ -36,8 +39,11 @@ const getAccountIcon = (type: string): string => {
 
 export default function ConnectedAccountsScreen({ onClose }: ConnectedAccountsScreenProps) {
   const [showConnectModal, setShowConnectModal] = useState(false);
+  const [showPlaidModal, setShowPlaidModal] = useState(false);
+  const [showWeb3Modal, setShowWeb3Modal] = useState(false);
   const accounts = useFinanceStore((state) => state.accounts);
   const investmentAccounts = useFinanceStore((state) => state.investmentAccounts);
+  const plaidLinkToken = useAppStore((state: any) => state.plaidLinkToken);
 
   const handleDisconnect = (accountId: string) => {
     // 這裡可以調用 mutation 來移除賬戶
@@ -142,6 +148,22 @@ export default function ConnectedAccountsScreen({ onClose }: ConnectedAccountsSc
         <ConnectAccountModal
           isOpen={showConnectModal}
           onClose={() => setShowConnectModal(false)}
+          onPlaidPress={() => setShowPlaidModal(true)}
+          onWeb3Press={() => setShowWeb3Modal(true)}
+        />
+
+        {/* Plaid Link Modal */}
+        <PlaidLinkModal
+          isVisible={showPlaidModal}
+          linkToken={plaidLinkToken}
+          onClose={() => setShowPlaidModal(false)}
+          onSuccess={() => setShowPlaidModal(false)}
+        />
+
+        {/* Web3 Wallet Modal */}
+        <AppKitWalletModal
+          isVisible={showWeb3Modal}
+          onClose={() => setShowWeb3Modal(false)}
         />
       </ScrollView>
     </View>

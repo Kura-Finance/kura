@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, View, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { Modal, View, ActivityIndicator, Text, TouchableOpacity, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { create, open, destroy } from 'react-native-plaid-link-sdk';
 import { useAppStore } from '../store/useAppStore';
@@ -12,164 +12,286 @@ interface PlaidLinkModalProps {
   onSuccess?: () => void;
 }
 
-/**
- * PlaidLinkModal Component
- * 
- * Manages the Plaid Link authentication flow using the official SDK.
- * When visible with a valid linkToken, automatically:
- * 1. Creates a Plaid session with the link token
- * 2. Opens the native Plaid Link UI
- * 3. Handles user authorization and success/exit callbacks
- * 4. Exchanges public token for access token on success
- * 5. Loads updated financial data
- */
+const LINK_TOKEN_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
+
 export default function PlaidLinkModal({ 
   isVisible, 
-  linkToken,
+  linkToken: initialLinkToken,
   onClose, 
   onSuccess 
 }: PlaidLinkModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
+
+  const sessionRef = useRef<boolean>(false);
+  const exitTimeoutRef = useRef<number | null>(null);
+  const hasExitedRef = useRef(false);
+  const tokenRequestAttemptRef = useRef(false);
 
   const confirmPlaidExchange = useAppStore((state: any) => state.confirmPlaidExchange);
+  const requestPlaidLinkToken = useAppStore((state: any) => state.requestPlaidLinkToken);
+  const plaidLinkTokenTimestamp = useAppStore((state: any) => state.plaidLinkTokenTimestamp);
+  const plaidLinkToken = useAppStore((state: any) => state.plaidLinkToken);
+
+  // 使用 store 的 token，如果没有则使用 prop 中的
+  const linkToken = plaidLinkToken || initialLinkToken;
+
+  const isTokenExpired = useCallback(() => {
+    if (!plaidLinkTokenTimestamp) return true;
+    const ageMs = Date.now() - plaidLinkTokenTimestamp;
+    return ageMs > LINK_TOKEN_EXPIRY_MS;
+  }, [plaidLinkTokenTimestamp]);
+
+  const handleRetry = async () => {
+    setError(null);
+    setIsLoading(false);
+    try {
+      await requestPlaidLinkToken();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to refresh token';
+      setError(msg);
+      Logger.error('PlaidLinkModal', 'Retry failed', { error: msg });
+    }
+  };
 
   useEffect(() => {
-    if (!isVisible || !linkToken) {
-      Logger.debug('PlaidLinkModal', 'useEffect skipped', {
-        isVisible,
-        hasLinkToken: !!linkToken,
-      });
+    // 如果 modal 打开且没有有效的 token，自动请求
+    if (isVisible && !linkToken && !tokenRequestAttemptRef.current && !isInitializing) {
+      tokenRequestAttemptRef.current = true;
+      Logger.debug('PlaidLinkModal', 'No token available, requesting one automatically');
+      setIsLoading(true);
+      requestPlaidLinkToken()
+        .then(() => {
+          Logger.info('PlaidLinkModal', 'Token auto-requested successfully');
+        })
+        .catch((err: any) => {
+          const msg = err instanceof Error ? err.message : 'Failed to get token';
+          setError(msg);
+          setIsLoading(false);
+          Logger.error('PlaidLinkModal', 'Auto-request failed', { error: msg });
+        });
       return;
     }
 
-    let isMounted = true;
+    if (!isVisible || !linkToken) {
+      Logger.debug('PlaidLinkModal', 'Not visible or no token', { isVisible, hasToken: !!linkToken });
+      return;
+    }
 
-    const openPlaidLinkFlow = async () => {
+    // Prevent re-initialization
+    if (isInitializing) return;
+
+    let isMounted = true;
+    let sessionCreated = false;
+
+    const initializePlaid = async () => {
       try {
-        if (!isMounted) return;
+        setIsInitializing(true);
         setIsLoading(true);
         setError(null);
 
-        Logger.debug('PlaidLinkModal', 'Creating Plaid Link session with token', {
-          token: linkToken?.substring(0, 20) + '...',
-        });
-
-        // Step 1: Create the Plaid session
-        try {
-          create({
-            token: linkToken,
-          });
-          Logger.debug('PlaidLinkModal', 'Plaid session created successfully');
-        } catch (createErr: any) {
-          Logger.error('PlaidLinkModal', 'Failed to create session', {
-            error: createErr instanceof Error ? createErr.message : String(createErr),
-          });
-          throw createErr;
-        }
-
         if (!isMounted) return;
 
-        Logger.debug('PlaidLinkModal', 'Opening Plaid Link UI with callbacks');
+        Logger.debug('PlaidLinkModal', 'Creating Plaid session', {
+          token: linkToken.substring(0, 20) + '...',
+          tokenExpired: isTokenExpired(),
+        });
 
-        // Step 2: Open Plaid Link with callbacks
+        // Create session
+        try {
+          create({ token: linkToken });
+          sessionCreated = true;
+          sessionRef.current = true;
+          Logger.info('PlaidLinkModal', 'Plaid session created');
+        } catch (err: any) {
+          Logger.error('PlaidLinkModal', 'Session creation failed', {
+            error: err instanceof Error ? err.message : String(err),
+          });
+          throw err;
+        }
+
+        if (!isMounted || !sessionCreated) return;
+
+        Logger.debug('PlaidLinkModal', 'Opening Plaid UI');
+
+        // Open Plaid Link
         try {
           open({
-            onSuccess: (linkSuccess: any) => {
-              if (!isMounted) return;
+            onSuccess: async (linkSuccess: any) => {
+              if (!isMounted || hasExitedRef.current) return;
+              hasExitedRef.current = true;
 
-              Logger.info('PlaidLinkModal', 'Plaid Link success', {
-                publicToken: linkSuccess?.publicToken?.substring(0, 20) + '...',
+              Logger.info('PlaidLinkModal', 'Plaid success', {
                 institution: linkSuccess?.metadata?.institution?.name,
               });
 
-              if (linkSuccess?.publicToken) {
-                confirmPlaidExchange(
-                  linkSuccess.publicToken,
-                  linkSuccess.metadata?.institution?.name
-                ).then(() => {
-                  if (!isMounted) return;
-                  Logger.info('PlaidLinkModal', 'Account connected successfully');
+              if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current);
+
+              try {
+                if (linkSuccess?.publicToken) {
+                  setIsLoading(true);
+                  await confirmPlaidExchange(
+                    linkSuccess.publicToken,
+                    linkSuccess.metadata?.institution?.name
+                  );
+                  if (isMounted) {
+                    Logger.info('PlaidLinkModal', 'Exchange and data load complete');
+                    onSuccess?.();
+                    setIsLoading(false);
+                    onClose();
+                  }
+                } else {
+                  throw new Error('No public token received');
+                }
+              } catch (exchangeErr: any) {
+                if (isMounted) {
+                  const msg = exchangeErr instanceof Error ? exchangeErr.message : 'Exchange failed';
+                  setError(msg);
                   setIsLoading(false);
-                  onSuccess?.();
-                  onClose();
-                }).catch((err: any) => {
-                  if (!isMounted) return;
-                  const errorMessage = err instanceof Error ? err.message : 'Failed to connect account';
-                  setError(errorMessage);
-                  Logger.error('PlaidLinkModal', 'Exchange failed after Plaid success', { error: errorMessage });
-                  setIsLoading(false);
-                });
-              } else {
-                if (!isMounted) return;
-                setError('Failed to retrieve public token from Plaid');
-                setIsLoading(false);
-                Logger.error('PlaidLinkModal', 'No public token received from Plaid');
+                  Logger.error('PlaidLinkModal', 'Exchange error', { error: msg });
+                }
               }
             },
             onExit: (linkExit: any) => {
-              if (!isMounted) return;
+              if (!isMounted || hasExitedRef.current) return;
+              hasExitedRef.current = true;
 
-              Logger.info('PlaidLinkModal', 'Plaid Link exited', {
+              Logger.info('PlaidLinkModal', 'Plaid exit', {
                 hasError: !!linkExit?.error,
                 errorCode: linkExit?.error?.errorCode,
               });
 
-              if (linkExit?.error) {
-                const errorMessage = linkExit.error.displayMessage || linkExit.error.errorCode || 'Link exited with error';
-                setError(errorMessage);
-                Logger.error('PlaidLinkModal', 'Plaid Link error', {
-                  error: errorMessage,
-                  code: linkExit.error.errorCode,
-                });
-                setIsLoading(false);
+              if (exitTimeoutRef.current) clearTimeout(exitTimeoutRef.current);
+
+              // iOS workaround: hasError=true but errorCode is empty means user cancelled
+              // In this case, close immediately without showing error
+              const hasValidError = linkExit?.error && linkExit.error.errorCode;
+              
+              if (hasValidError) {
+                const errorMsg = linkExit.error.displayMessage || 
+                                 linkExit.error.errorMessage ||
+                                 'Link error occurred';
+                if (isMounted) {
+                  setError(errorMsg || 'An error occurred');
+                  setIsLoading(false);
+                }
               } else {
-                Logger.info('PlaidLinkModal', 'User closed Plaid Link normally', {
-                  status: linkExit?.metadata?.status,
-                });
-                setIsLoading(false);
-                onClose();
+                // User cancelled or iOS empty error - close immediately
+                if (isMounted) {
+                  setIsLoading(false);
+                  setError(null);
+                  setTimeout(() => {
+                    if (isMounted) onClose();
+                  }, 100);
+                }
               }
             },
           });
-          Logger.debug('PlaidLinkModal', 'open() function called successfully');
+
+          Logger.debug('PlaidLinkModal', 'Plaid UI opened');
+
+          // Safety timeout for iOS
+          exitTimeoutRef.current = setTimeout(() => {
+            if (!isMounted || hasExitedRef.current) return;
+            Logger.warn('PlaidLinkModal', 'No response after 60s, forcing close');
+            hasExitedRef.current = true;
+            if (isMounted) {
+              setIsLoading(false);
+              onClose();
+            }
+          }, 60000) as any;
+
         } catch (openErr: any) {
-          if (!isMounted) return;
-          Logger.error('PlaidLinkModal', 'Failed to open Link UI', {
+          Logger.error('PlaidLinkModal', 'Failed to open Plaid', {
             error: openErr instanceof Error ? openErr.message : String(openErr),
           });
           throw openErr;
         }
       } catch (err: any) {
-        if (!isMounted) return;
-        const errorMessage = err?.message || (err instanceof Error ? err.message : 'Failed to initialize Plaid Link');
-        setError(errorMessage);
-        Logger.error('PlaidLinkModal', 'Fatal error in openPlaidLinkFlow', { error: errorMessage });
-        setIsLoading(false);
+        if (isMounted) {
+          const msg = err instanceof Error ? err.message : 'Failed to initialize Plaid';
+          setError(msg);
+          setIsLoading(false);
+          Logger.error('PlaidLinkModal', 'Initialization error', { error: msg });
+        }
+      } finally {
+        if (isMounted) {
+          setIsInitializing(false);
+        }
       }
     };
 
-    // Auto-open Plaid Link when token is available
-    if (!isLoading && !error) {
-      openPlaidLinkFlow();
+    // Only initialize if we have a valid token
+    if (linkToken && !isTokenExpired()) {
+      initializePlaid();
+    } else if (linkToken && isTokenExpired()) {
+      setError('Token expired. Requesting new one...');
+      requestPlaidLinkToken().catch((err: any) => {
+        const msg = err instanceof Error ? err.message : 'Failed to refresh token';
+        if (isMounted) setError(msg);
+      });
     }
 
-    // Cleanup: destroy session when modal closes
     return () => {
       isMounted = false;
-      try {
-        destroy();
-        Logger.debug('PlaidLinkModal', 'Plaid session destroyed on cleanup');
-      } catch (err: any) {
-        Logger.warn('PlaidLinkModal', 'Failed to destroy Plaid session', {
-          error: err instanceof Error ? err.message : 'Unknown error',
-        });
+      Logger.debug('PlaidLinkModal', 'useEffect cleanup triggered');
+      
+      if (exitTimeoutRef.current) {
+        clearTimeout(exitTimeoutRef.current);
+        Logger.debug('PlaidLinkModal', 'Cleared exit timeout');
       }
+      
+      // 立即销毁 Plaid session
+      if (sessionRef.current) {
+        try {
+          destroy();
+          sessionRef.current = false;
+          Logger.info('PlaidLinkModal', 'Plaid session destroyed successfully');
+        } catch (err: any) {
+          Logger.warn('PlaidLinkModal', 'Error destroying session', { error: String(err) });
+        }
+      }
+      
+      Keyboard.dismiss();
     };
-  }, [isVisible, linkToken, confirmPlaidExchange, onClose, onSuccess]);
+  }, [isVisible, linkToken, isInitializing, requestPlaidLinkToken, confirmPlaidExchange, onClose, onSuccess, isTokenExpired]);
+
+  // 重置状态和 ref 当 modal 关闭
+  useEffect(() => {
+    if (!isVisible) {
+      Logger.debug('PlaidLinkModal', 'Modal closed - resetting state');
+      tokenRequestAttemptRef.current = false;
+      hasExitedRef.current = false;
+      sessionRef.current = false;
+      setIsLoading(false);
+      setError(null);
+      setIsInitializing(false);
+      Logger.info('PlaidLinkModal', 'State reset complete');
+    }
+  }, [isVisible]);
 
   return (
-    <Modal visible={isVisible} transparent statusBarTranslucent onRequestClose={onClose}>
+    <Modal 
+      visible={isVisible} 
+      transparent 
+      statusBarTranslucent 
+      onRequestClose={() => {
+        Logger.debug('PlaidLinkModal', 'onRequestClose triggered');
+        onClose();
+      }}
+      onDismiss={() => {
+        Logger.info('PlaidLinkModal', 'Modal dismissed - cleaning up');
+        // 确保 session 被销毁
+        try {
+          destroy();
+          Logger.info('PlaidLinkModal', 'Plaid session destroyed on modal dismiss');
+        } catch (err) {
+          Logger.warn('PlaidLinkModal', 'Session already destroyed or error', { error: String(err) });
+        }
+        Keyboard.dismiss();
+      }}
+    >
       <View className="flex-1 bg-black/60 justify-center items-center p-4">
         <View className="bg-[#0B0B0F] border border-white/10 rounded-3xl overflow-hidden w-full">
           {/* Header */}
@@ -178,7 +300,7 @@ export default function PlaidLinkModal({
               <Text className="text-xl font-bold text-white">Connect Bank Account</Text>
               <Text className="text-sm text-gray-400 mt-1">via Plaid</Text>
             </View>
-            {!isLoading && (
+            {!isLoading && !isInitializing && (
               <TouchableOpacity
                 onPress={onClose}
                 className="w-8 h-8 rounded-full bg-white/10 justify-center items-center"
@@ -190,14 +312,14 @@ export default function PlaidLinkModal({
 
           {/* Content */}
           <View className="p-6">
-            {isLoading ? (
+            {isLoading || isInitializing ? (
               <View className="items-center py-8">
                 <ActivityIndicator size="large" color="#8B5CF6" />
                 <Text className="text-white mt-4 text-center">
                   Initializing Plaid Link...
                 </Text>
                 <Text className="text-gray-400 text-xs mt-2 text-center">
-                  Setting up secure connection to Plaid
+                  Setting up secure connection
                 </Text>
               </View>
             ) : error ? (
@@ -209,7 +331,7 @@ export default function PlaidLinkModal({
                   </View>
                 </View>
                 <TouchableOpacity
-                  onPress={onClose}
+                  onPress={handleRetry}
                   className="bg-[#8B5CF6] rounded-xl py-3 items-center mb-2"
                 >
                   <Text className="text-white font-semibold">Try Again</Text>
@@ -222,30 +344,12 @@ export default function PlaidLinkModal({
                 </TouchableOpacity>
               </View>
             ) : (
-              <View>
-                <View className="bg-[#1A1A24] rounded-xl p-4 mb-4">
-                  <Text className="text-gray-300 text-sm leading-5">
-                    Plaid Link will open momentarily. Follow the prompts to authorize your bank account.
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={onClose}
-                  className="border border-white/10 rounded-xl py-3 items-center"
-                >
-                  <Text className="text-white font-semibold">Cancel</Text>
-                </TouchableOpacity>
+              <View className="items-center py-4">
+                <Text className="text-gray-300 text-sm text-center">
+                  Waiting for Plaid Link to open...
+                </Text>
               </View>
             )}
-          </View>
-
-          {/* Info */}
-          <View className="bg-[#1A1A24] px-6 py-4 border-t border-white/5">
-            <View className="flex-row items-start">
-              <Ionicons name="shield-checkmark" size={16} color="#8B5CF6" style={{ marginRight: 8, marginTop: 2 }} />
-              <Text className="text-gray-400 text-xs flex-1">
-                Your banking credentials are encrypted and secured by Plaid. We never store your passwords.
-              </Text>
-            </View>
           </View>
         </View>
       </View>

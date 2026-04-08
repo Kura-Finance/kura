@@ -2,7 +2,10 @@ import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { Account } from '../../../shared/store/useFinanceStore';
+import { useAppStore } from '../../../shared/store/useAppStore';
 import ConnectAccountModal from '../../../shared/components/ConnectAccountModal';
+import PlaidLinkModal from '../../../shared/components/PlaidLinkModal';
+import AppKitWalletModal from '../../../shared/components/AppKitWalletModal';
 
 interface AccountsListProps {
   accounts: Account[];
@@ -28,6 +31,9 @@ export default function AccountsList({
 }: AccountsListProps) {
   const scrollViewRef = useRef<ScrollView>(null);
   const [showConnectModal, setShowConnectModal] = useState(false);
+  const [showPlaidModal, setShowPlaidModal] = useState(false);
+  const [showWeb3Modal, setShowWeb3Modal] = useState(false);
+  const plaidLinkToken = useAppStore((state: any) => state.plaidLinkToken);
 
   // 默认滚动到最底部
   useEffect(() => {
@@ -203,6 +209,22 @@ export default function AccountsList({
       <ConnectAccountModal
         isOpen={showConnectModal}
         onClose={() => setShowConnectModal(false)}
+        onPlaidPress={() => setShowPlaidModal(true)}
+        onWeb3Press={() => setShowWeb3Modal(true)}
+      />
+
+      {/* Plaid Link Modal */}
+      <PlaidLinkModal
+        isVisible={showPlaidModal}
+        linkToken={plaidLinkToken}
+        onClose={() => setShowPlaidModal(false)}
+        onSuccess={() => setShowPlaidModal(false)}
+      />
+
+      {/* Web3 Wallet Modal */}
+      <AppKitWalletModal
+        isVisible={showWeb3Modal}
+        onClose={() => setShowWeb3Modal(false)}
       />
     </>
   );

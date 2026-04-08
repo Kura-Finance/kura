@@ -1,79 +1,95 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppStore } from '../store/useAppStore';
-import AppKitWalletButton from './AppKitWalletButton';
-import PlaidLinkModal from './PlaidLinkModal';
+import Logger from '../utils/Logger';
 
 interface ConnectAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onPlaidPress?: () => void;
+  onWeb3Press?: () => void;
 }
 
 export default function ConnectAccountModal({
   isOpen,
   onClose,
+  onPlaidPress,
+  onWeb3Press,
 }: ConnectAccountModalProps) {
-  const [isConnecting, setIsConnecting] = useState<'plaid' | null>(null);
+  const [isConnecting, setIsConnecting] = useState<'plaid' | 'web3' | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [showPlaidModal, setShowPlaidModal] = useState(false);
 
-  const requestPlaidLinkToken = useAppStore((state: any) => state.requestPlaidLinkToken);
-  const plaidLinkToken = useAppStore((state: any) => state.plaidLinkToken);
-
-  const handlePlaidPress = async () => {
+  const handlePlaidPress = () => {
     try {
       setIsConnecting('plaid');
       setError(null);
-      // Request link token and show modal
-      await requestPlaidLinkToken();
-      setShowPlaidModal(true);
+      // 直接通知父组件打开 PlaidLinkModal
+      // PlaidLinkModal 会自动处理所有 Plaid 逻辑
+      onClose();
+      setTimeout(() => {
+        setIsConnecting(null);
+        onPlaidPress?.();
+      }, 200);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to initialize Plaid');
-    } finally {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to open Plaid';
+      setError(errorMsg);
       setIsConnecting(null);
+      Logger.error('ConnectAccountModal', 'Failed to open Plaid', { error: errorMsg });
+    }
+  };
+
+  const handleWeb3Press = () => {
+    try {
+      setIsConnecting('web3');
+      setError(null);
+      // 直接通知父组件打开 AppKitWalletModal
+      // AppKitWalletModal 会自动处理所有 AppKit 逻辑
+      onClose();
+      setTimeout(() => {
+        setIsConnecting(null);
+        onWeb3Press?.();
+      }, 200);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to open Web3 wallet';
+      setError(errorMsg);
+      setIsConnecting(null);
+      Logger.error('ConnectAccountModal', 'Failed to open Web3 wallet', { error: errorMsg });
     }
   };
 
   const handleClose = () => {
+    Keyboard.dismiss();
     setError(null);
     setIsConnecting(null);
     onClose();
   };
 
-  const handlePlaidModalClose = () => {
-    setShowPlaidModal(false);
-    setIsConnecting(null);
-    setError(null);
-  };
-
-  const handlePlaidModalSuccess = () => {
-    setShowPlaidModal(false);
-    setIsConnecting(null);
-    handleClose();
-  };
-
-  const handleWalletConnected = () => {
-    handleClose();
-  };
-
   return (
     <>
-      <Modal visible={isOpen} transparent animationType="fade">
+      <Modal 
+        visible={isOpen} 
+        transparent 
+        animationType="fade" 
+        onRequestClose={handleClose}
+        onDismiss={() => {
+          Keyboard.dismiss();
+        }}
+      >
         <TouchableWithoutFeedback onPress={handleClose}>
           <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableWithoutFeedback onPress={() => {}}>
-              {/* Card */}
-              <View
-                style={{
-                  width: '85%',
-                  backgroundColor: '#0B0B0F',
-                  borderRadius: 20,
-                  borderWidth: 1,
-                  borderColor: 'rgba(255, 255, 255, 0.1)',
-                  overflow: 'hidden',
-                }}
-              >
+            {/* Card - use View instead of TouchableWithoutFeedback to avoid event conflicts */}
+            <View
+              style={{
+                width: '85%',
+                backgroundColor: '#0B0B0F',
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                overflow: 'hidden',
+              }}
+              onStartShouldSetResponder={() => true}
+              onResponderTerminationRequest={() => false}
+            >
                 {/* Header */}
                 <View
                   style={{
@@ -167,60 +183,53 @@ export default function ConnectAccountModal({
                   </TouchableOpacity>
 
                   {/* AppKit Wallet Button */}
-                  <View
+                  <TouchableOpacity
+                    onPress={handleWeb3Press}
+                    disabled={isConnecting !== null}
                     style={{
                       padding: 16,
                       borderRadius: 16,
                       borderWidth: 1,
-                      borderColor: 'rgba(255, 255, 255, 0.05)',
-                      backgroundColor: '#1A1A24',
-                      gap: 8,
-                      opacity: 0.5,
+                      borderColor: isConnecting === 'web3' ? 'rgba(59, 130, 246, 0.5)' : 'rgba(255, 255, 255, 0.05)',
+                      backgroundColor: isConnecting === 'web3' ? 'rgba(59, 130, 246, 0.1)' : '#1A1A24',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 16,
                     }}
                   >
-                    {/* Header */}
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                      <View
-                        style={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: 12,
-                          backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Ionicons name="swap-horizontal" size={24} color="#3B82F6" />
-                      </View>
-
-                      <View style={{ flex: 1 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                          <Text style={{ fontSize: 16, fontWeight: '600', color: '#3B82F6', marginBottom: 4 }}>Reown AppKit</Text>
-                          <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, backgroundColor: 'rgba(107, 114, 128, 0.3)', borderWidth: 1, borderColor: 'rgba(107, 114, 128, 0.5)' }}>
-                            <Text style={{ fontSize: 10, color: '#9CA3AF', fontWeight: '600' }}>Unavailable</Text>
-                          </View>
-                        </View>
-                        <Text style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 16 }}>Connect Web3 wallets</Text>
-                      </View>
+                    {/* Icon */}
+                    <View
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 12,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons name="wallet" size={24} color="#3B82F6" />
                     </View>
 
-                    {/* Button */}
-                    <AppKitWalletButton onConnected={handleWalletConnected} disabled={true} />
-                  </View>
+                    {/* Content */}
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 16, fontWeight: '600', color: '#3B82F6', marginBottom: 4 }}>Reown AppKit</Text>
+                      <Text style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 16 }}>Connect Web3 wallets</Text>
+                    </View>
+
+                    {/* Spinner or Arrow */}
+                    {isConnecting === 'web3' ? (
+                      <ActivityIndicator color="#3B82F6" size="small" />
+                    ) : (
+                      <Ionicons name="chevron-forward" size={20} color="#3B82F6" />
+                    )}
+                  </TouchableOpacity>
                 </View>
               </View>
-            </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* Plaid Link Modal */}
-      <PlaidLinkModal
-        isVisible={showPlaidModal}
-        linkToken={plaidLinkToken}
-        onClose={handlePlaidModalClose}
-        onSuccess={handlePlaidModalSuccess}
-      />
     </>
   );
 }

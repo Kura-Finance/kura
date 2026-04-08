@@ -1,11 +1,14 @@
 import React, { useMemo, useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { useFinanceStore } from '../../../shared/store/useFinanceStore';
+import { useAppStore } from '../../../shared/store/useAppStore';
 import PerformanceSummary from '../components/PerformanceSummary';
 import WaveChart from '../components/WaveChart';
 import AccountCapsules from '../components/AccountCapsules';
 import HoldingsList from '../components/HoldingsList';
 import ConnectAccountModal from '../../../shared/components/ConnectAccountModal';
+import PlaidLinkModal from '../../../shared/components/PlaidLinkModal';
+import AppKitWalletModal from '../../../shared/components/AppKitWalletModal';
 
 export default function InvestmentScreen() {
   const investmentAccounts = useFinanceStore((state) => state.investmentAccounts);
@@ -14,6 +17,9 @@ export default function InvestmentScreen() {
   const setSelectedTimeRange = useFinanceStore((state) => state.setSelectedTimeRange);
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [showConnectModal, setShowConnectModal] = useState(false);
+  const [showPlaidModal, setShowPlaidModal] = useState(false);
+  const [showWeb3Modal, setShowWeb3Modal] = useState(false);
+  const plaidLinkToken = useAppStore((state: any) => state.plaidLinkToken);
 
   const displayedInvestments = useMemo(() => {
     if (selectedAccountId) {
@@ -47,6 +53,22 @@ export default function InvestmentScreen() {
       <ConnectAccountModal
         isOpen={showConnectModal}
         onClose={() => setShowConnectModal(false)}
+        onPlaidPress={() => setShowPlaidModal(true)}
+        onWeb3Press={() => setShowWeb3Modal(true)}
+      />
+
+      {/* Plaid Link Modal */}
+      <PlaidLinkModal
+        isVisible={showPlaidModal}
+        linkToken={plaidLinkToken}
+        onClose={() => setShowPlaidModal(false)}
+        onSuccess={() => setShowPlaidModal(false)}
+      />
+
+      {/* Web3 Wallet Modal */}
+      <AppKitWalletModal
+        isVisible={showWeb3Modal}
+        onClose={() => setShowWeb3Modal(false)}
       />
     </View>
   );

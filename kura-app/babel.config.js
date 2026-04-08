@@ -1,7 +1,15 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    presets: [
+      [
+        'babel-preset-expo',
+        {
+          // 💡 Reown AppKit requires this for valtio support on Expo 53+
+          unstable_transformImportMeta: true,
+        },
+      ],
+    ],
     plugins: [
       // 如果你有裝 NativeWind，它的 plugin 會在這裡，例如 'nativewind/babel'
       

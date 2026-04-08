@@ -1,3 +1,4 @@
+import '@walletconnect/react-native-compat';
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
@@ -12,6 +13,9 @@ import TabNavigator from './src/components/TabNavigator';
 import LoginScreen from './src/features/auth/screens/LoginScreen';
 import SignupScreen from './src/features/auth/screens/SignupScreen';
 import ForgotPasswordScreen from './src/features/auth/screens/ForgotPasswordScreen';
+import { AppKitProvider } from '@reown/appkit-react-native'
+import { appKit } from './src/shared/config/AppKitConfig';
+
 
 // 💡 建立專屬 Kura 的深色導航主題
 // 這能確保在頁面切換、或是抽屜推拉時，底色不會突然閃出白光
@@ -82,7 +86,6 @@ function MainNavigator() {
     <View style={{ flex: 1, backgroundColor: '#0B0B0F' }}>
       {/* Header 固定在頂部 */}
       <Header />
-      
       {/* TabNavigator 占據剩餘空間 */}
       <TabNavigator />
     </View>
@@ -123,15 +126,13 @@ export default function App() {
   }
 
   return (
-    // SafeAreaProvider 確保在有瀏海或動態島的 iPhone 上，UI 不會被切到
     <SafeAreaProvider>
-      {/* NavigationContainer 是所有路由的總司令部 */}
+      <AppKitProvider instance={appKit}>
       <NavigationContainer theme={KuraDarkTheme}>
-        {/* 確保手機頂部的時間、電量等狀態列圖示是白色的 (Light Content) */}
         <StatusBar style="light" translucent={true} />
-
         {authStatus === 'authenticated' ? <MainNavigator /> : <AuthNavigator />}
       </NavigationContainer>
+      </AppKitProvider>
     </SafeAreaProvider>
   );
 }
