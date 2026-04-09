@@ -71,6 +71,7 @@ async function fetchNativeBalance(address: string, chainId: number): Promise<num
 export function useWalletSync() {
   const { open: openAppKit } = useAppKit();
   const syncConnectedWalletPosition = useFinanceStore((state) => state.syncConnectedWalletPosition);
+  const removeConnectedWalletPosition = useFinanceStore((state) => state.removeConnectedWalletPosition);
   const prevStateRef = useRef<{ address?: string; chainId?: number }>({});
   const [accountState, setAccountState] = useState<{ address?: string; chainId?: number }>({});
   const [appState, setAppState] = useState<AppStateStatus>('active');
@@ -170,6 +171,14 @@ export function useWalletSync() {
     const syncWalletToStore = async () => {
       const { address, chainId } = accountState;
 
+      // 監聽斷連：如果之前連接（address 存在），現在斷連（accountState 為空）
+      if (prevStateRef.current.address && !address) {
+        Logger.warn('useWalletSync', '🔌 Wallet disconnected, clearing store');
+        removeConnectedWalletPosition(prevStateRef.current.address, prevStateRef.current.chainId || 1);
+        prevStateRef.current = {};
+        return;
+      }
+
       if (!address || !chainId) {
         return;
       }
@@ -217,7 +226,7 @@ export function useWalletSync() {
     };
 
     syncWalletToStore();
-  }, [accountState, syncConnectedWalletPosition]);
+  }, [accountState, syncConnectedWalletPosition, removeConnectedWalletPosition]);
 
   // Re-sync when currency changes (to fetch price in new currency)
   const currency = useFinanceStore(state => state.currency);

@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, Dimensions, ScrollView } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import type { Account } from '../../../shared/store/useFinanceStore';
 import { useAppStore } from '../../../shared/store/useAppStore';
+import { useFinanceStore } from '../../../shared/store/useFinanceStore';
+import { useWalletSync } from '../../../shared/hooks/useWalletSync';
 import ConnectAccountModal from '../../../shared/components/ConnectAccountModal';
 import PlaidLinkModal from '../../../shared/components/PlaidLinkModal';
 import ExchangeLinkModal from '../../../shared/components/ExchangeLinkModal';
@@ -31,17 +33,26 @@ export default function AccountsList({
   const [showPlaidModal, setShowPlaidModal] = useState(false);
   const [showExchangeModal, setShowExchangeModal] = useState(false);
   const plaidLinkToken = useAppStore((state: any) => state.plaidLinkToken);
+  
+  // Web3 Wallet
+  const { isConnected, address, openWallet } = useWalletSync();
+  const investments = useFinanceStore((state) => state.investments);
+  
+  // Calculate Stablecoin (USDC + USDT) balance
+  const stablecoinBalance = investments
+    .filter((inv) => inv.symbol === 'USDC' || inv.symbol === 'USDT')
+    .reduce((sum, inv) => sum + (inv.holdings * inv.currentPrice), 0);
 
   // 默认滚动到最底部
   useEffect(() => {
     setTimeout(() => {
-      // 计算总高度：所有卡片（包括 Overview）
-      const totalCards = accounts.length + 1; // accounts + Overview
+      // 计算总高度：所有卡片（包括 Overview 和可能的 Web3）
+      const totalCards = accounts.length + 1 + (isConnected ? 1 : 0); // accounts + Overview + Web3 (optional)
       const totalHeight = CARD_HEIGHT + ((totalCards - 1) * CARD_OVERLAP);
       const scrollPosition = Math.max(0, totalHeight - CONTAINER_HEIGHT);
       scrollViewRef.current?.scrollTo({ y: scrollPosition, animated: false });
     }, 0);
-  }, [accounts.length]);
+  }, [accounts.length, isConnected]);
 
   return (
     <>
@@ -160,6 +171,58 @@ export default function AccountsList({
             );
           })}
 
+          {/* Web3 Wallet Card - 如果連接了 */}
+          {isConnected && address && (
+            <TouchableOpacity
+              onPress={openWallet}
+              activeOpacity={0.9}
+              style={{
+                borderRadius: 16,
+                marginTop: -CARD_OVERLAP,
+                zIndex: accounts.length + 1,
+                overflow: 'hidden',
+                borderWidth: 2,
+                borderColor: '#1A1A24',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 18 },
+                shadowOpacity: 0.35,
+                shadowRadius: 40,
+                elevation: 5,
+              }}
+            >
+              <LinearGradient 
+                colors={['#1A1A24', '#1A1A24']}
+                style={{ height: CARD_HEIGHT, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 16 }}
+              >
+                {/* Top Row: Address (left) and Stablecoin (right) */}
+                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                  {/* Left Container - Wallet Address (First 5 chars) */}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 14, color: '#999999', fontWeight: '600' }} numberOfLines={1}>
+                      {address.slice(0, 5)}...
+                    </Text>
+                  </View>
+                  {/* Right Container - Stablecoin Balance */}
+                  <View>
+                    <CurrencyDisplay
+                      value={stablecoinBalance}
+                      fontSize={18}
+                      color="#FFFFFF"
+                      style={{ marginLeft: 8 }}
+                    />
+                  </View>
+                </View>
+
+                {/* Bottom: Web3 Wallet label (left) */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                  <Text style={{ fontSize: 11, color: '#999999', fontWeight: '500', textTransform: 'uppercase', letterSpacing: 0.28 }}>
+                    Web3 Wallet
+                  </Text>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
+
           {/* Overview 卡片 - 最後渲染（排序在底部），但 zIndex 最高（圖層在最上面） */}
           <TouchableOpacity
             onPress={() => onSelectAccount('all')}
@@ -167,7 +230,7 @@ export default function AccountsList({
             style={{
               borderRadius: 16,
               marginTop: -CARD_OVERLAP,
-              zIndex: accounts.length + 1,
+              zIndex: accounts.length + (isConnected ? 2 : 1),
               overflow: 'hidden',
               borderWidth: 2,
               borderColor: '#1A1A24',
