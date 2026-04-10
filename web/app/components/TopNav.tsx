@@ -18,7 +18,13 @@ export default function TopNav() {
         
         {/* 左側 Logo */}
         <div className="text-lg font-bold text-white flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#8B5CF6] to-[#A78BFA] shadow-[0_0_10px_rgba(139,92,246,0.4)]" />
+          <Image
+            src="/logo.svg"
+            alt="Kura Logo"
+            width={32}
+            height={32}
+            className="w-8 h-8"
+          />
           Kura
         </div>
 

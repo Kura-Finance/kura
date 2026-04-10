@@ -143,11 +143,11 @@ export async function getSupportedExchanges(token?: string): Promise<SupportedEx
     }
 
     const response = await fetch(url, { headers });
-    const data = (await response.json()) as { exchanges: SupportedExchange[] };
+    const data = (await response.json()) as { exchanges?: SupportedExchange[] } & ApiErrorBody;
 
     if (!response.ok) {
       throw new ExchangeApiError(
-        data?.error || `HTTP ${response.status}`,
+        data?.error || data?.message || `HTTP ${response.status}`,
         response.status
       );
     }

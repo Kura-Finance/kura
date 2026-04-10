@@ -8,6 +8,11 @@ import Web3ModalProvider from '@/context/Web3ModalProvider';
 export const metadata: Metadata = {
   title: "Kura | Your Financial Nexus",
   description: "Track your cross-border fiat and web3 assets.",
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
