@@ -84,7 +84,7 @@ export default function PlaidLinkModal({
    * 自动请求没有的 token
    */
   useEffect(() => {
-    if (!isVisible || linkToken || isInitializing) return;
+    if (!isVisible || linkToken || isInitializing || isLoading) return;
 
     Logger.debug('PlaidLinkModal', 'Auto-requesting token', { linkToken, isInitializing });
     setIsLoading(true);
@@ -104,7 +104,7 @@ export default function PlaidLinkModal({
           Logger.error('PlaidLinkModal', 'Auto-request failed', { error: msg });
         }
       });
-  }, [isVisible, linkToken, isInitializing, requestPlaidLinkToken]);
+  }, [isVisible, linkToken, isInitializing, isLoading, requestPlaidLinkToken]);
 
   /**
    * 处理 token 过期 - 自动刷新
@@ -163,7 +163,6 @@ export default function PlaidLinkModal({
     }
 
     let isMounted = true;
-    let crashGuardTimer: NodeJS.Timeout | null = null;
 
     const createSession = async () => {
       try {
@@ -176,17 +175,7 @@ export default function PlaidLinkModal({
           token: linkToken.substring(0, 20) + '...',
         });
 
-        // Crash guard: If no response after 30s, abort
-        crashGuardTimer = setTimeout(() => {
-          if (isMounted && sessionRef.current) {
-            Logger.warn('PlaidLinkModal', 'No response after 30s, session creation timeout');
-            setError('Plaid UI is not responding. Please try again.');
-            setSessionState('idle');
-            setIsLoading(false);
-            setIsInitializing(false);
-          }
-        }, 30000);
-
+        // create() is synchronous, no need for crash guard
         create({ token: linkToken });
         
         if (isMounted) {
@@ -202,7 +191,6 @@ export default function PlaidLinkModal({
           setSessionState('idle');
         }
       } finally {
-        if (crashGuardTimer) clearTimeout(crashGuardTimer);
         if (isMounted) {
           setIsLoading(false);
           setIsInitializing(false);
@@ -214,7 +202,6 @@ export default function PlaidLinkModal({
 
     return () => {
       isMounted = false;
-      if (crashGuardTimer) clearTimeout(crashGuardTimer);
     };
   }, [isVisible, linkToken, isTokenExpired, sessionState]);
 
