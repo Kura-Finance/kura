@@ -9,9 +9,9 @@ import {
   requestEmailChange,
   confirmEmailChange,
   loginUser,
-  sendVerificationCode,
-  verifyEmailAndRegister,
-  resendVerificationCode,
+  sendVerificationCode as sendVerificationCodeApi,
+  verifyEmailAndRegister as verifyEmailAndRegisterApi,
+  resendVerificationCode as resendVerificationCodeApi,
   changePassword as changePasswordApi,
   requestPasswordReset as requestPasswordResetApi,
   resetPassword as resetPasswordApi,
@@ -71,9 +71,8 @@ interface AppState {
 
   // Auth methods
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  deleteAccount: () => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
   changePassword: (oldPassword: string, newPassword: string) => Promise<void>;
   
   // Registration flow (new)
@@ -195,64 +194,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
-  signup: async (email: string, password: string) => {
-    try {
-      const normalizedEmail = email.toLowerCase().trim();
-      Logger.debug('AppStore', 'Attempting signup', { email: normalizedEmail });
-      set({ authStatus: 'loading', authError: null });
-
-      const response = await verifyEmailAndRegister(normalizedEmail, password, '');
-      await setStoredAuthToken(response.token);
-
-      Logger.info('AppStore', 'Signup successful', { email: normalizedEmail });
-      set({
-        authToken: response.token,
-        authStatus: 'authenticated',
-        userProfile: {
-          displayName: response.user.displayName,
-          email: normalizedEmail,
-          avatarUrl: response.user.avatarUrl || '',
-          membershipLabel: response.user.membershipLabel || '',
-        },
-        authError: null,
-        preferences: {
-          baseCurrency: 'USD',
-          language: 'en',
-          largeTransactionAlerts: false,
-          weeklyAiSummary: false,
-        },
-        aiInsights: [],
-      });
-
-      // Auto-load Plaid data from backend
-      try {
-        Logger.debug('AppStore', 'Auto-loading Plaid finance data after signup');
-        const hydratePlaidFinanceData = useFinanceStore.getState().hydratePlaidFinanceData;
-        await hydratePlaidFinanceData(response.token);
-        Logger.info('AppStore', 'Plaid finance data auto-loaded after signup');
-        
-        // Record asset snapshot for performance tracking
-        const recordAssetSnapshot = useFinanceStore.getState().recordAssetSnapshot;
-        recordAssetSnapshot();
-      } catch (plaidError) {
-        // Plaid data loading is optional - don't fail the signup if it fails
-        Logger.warn('AppStore', 'Failed to auto-load Plaid data after signup', plaidError);
-      }
-
-      // Load exchange rates
-      try {
-        await get().loadExchangeRates();
-      } catch (rateError) {
-        Logger.warn('AppStore', 'Failed to load exchange rates after signup', rateError);
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Signup failed';
-      Logger.error('AppStore', 'Signup failed', { error: errorMessage });
-      set({ authStatus: 'unauthenticated', authError: errorMessage });
-      throw error;
-    }
-  },
-
   logout: async () => {
     try {
       Logger.info('AppStore', 'Logging out');
@@ -281,7 +222,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
-  deleteAccount: async () => {
+  deleteAccount: async (password: string) => {
     try {
       const authToken = get().authToken;
       if (!authToken) {
@@ -289,7 +230,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
 
       Logger.info('AppStore', 'Deleting account');
-      await deleteAccountApi(authToken);
+      await deleteAccountApi(authToken, password);
       
       // Clear auth token and reset state
       await clearStoredAuthToken();
@@ -368,7 +309,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     try {
       const normalizedEmail = email.toLowerCase().trim();
       Logger.debug('AppStore', 'Sending verification code', { email: normalizedEmail });
-      await sendVerificationCode(normalizedEmail);
+      await sendVerificationCodeApi(normalizedEmail);
       Logger.info('AppStore', 'Verification code sent', { email: normalizedEmail });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to send verification code';
@@ -381,7 +322,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     try {
       const normalizedEmail = email.toLowerCase().trim();
       Logger.debug('AppStore', 'Verifying email and registering', { email: normalizedEmail });
-      const response = await verifyEmailAndRegister(normalizedEmail, password, verificationCode);
+      const response = await verifyEmailAndRegisterApi(normalizedEmail, password, verificationCode);
       await setStoredAuthToken(response.token);
 
       Logger.info('AppStore', 'Registration verified successfully');
@@ -436,7 +377,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     try {
       const normalizedEmail = email.toLowerCase().trim();
       Logger.debug('AppStore', 'Resending verification code', { email: normalizedEmail });
-      await resendVerificationCode(normalizedEmail);
+      await resendVerificationCodeApi(normalizedEmail);
       Logger.info('AppStore', 'Verification code resent', { email: normalizedEmail });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to resend verification code';

@@ -127,11 +127,16 @@ async function apiRequest<T>(
       method: options.method || 'GET',
       url,
       hasAuth: !!token,
+      hasBody: !!options.body,
+      bodyPreview: options.body ? String(options.body).substring(0, 100) : undefined,
+      contentType: headers.get('Content-Type'),
+      headerCount: Array.from(headers.entries()).length,
     });
 
     const response = await fetch(url, {
-      ...options,
+      method: options.method || 'GET',
       headers,
+      body: options.body,
     });
 
     const raw = await response.text();
@@ -189,7 +194,7 @@ export const verifyEmailAndRegister = (
   const normalizedEmail = email.toLowerCase().trim();
   return apiRequest<AuthResponse>('/api/auth/register/verify', {
     method: 'POST',
-    body: JSON.stringify({ email: normalizedEmail, password, code: verificationCode }),
+    body: JSON.stringify({ email: normalizedEmail, password, verificationCode }),
   });
 };
 
@@ -350,9 +355,11 @@ export const resetPassword = (
  * 删除用户账户
  */
 export const deleteAccount = (
-  token: string
+  token: string,
+  password: string
 ): Promise<{ message: string }> => {
   return apiRequest<{ message: string }>('/api/auth/me', {
     method: 'DELETE',
+    body: JSON.stringify({ password }),
   }, token);
 };

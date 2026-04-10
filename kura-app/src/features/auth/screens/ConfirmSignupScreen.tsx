@@ -70,7 +70,7 @@ export default function ConfirmSignupScreen({
         return;
       }
 
-      if (!password) {
+      if (!password.trim()) {
         setError('Password is required');
         return;
       }
@@ -80,7 +80,7 @@ export default function ConfirmSignupScreen({
         return;
       }
 
-      if (!confirmPassword) {
+      if (!confirmPassword.trim()) {
         setError('Please confirm your password');
         return;
       }
@@ -94,7 +94,7 @@ export default function ConfirmSignupScreen({
       setError(null);
 
       Logger.debug('ConfirmSignupScreen', 'Verifying email and registering', { email, hasVerificationCode: !!verificationCode, hasPassword: !!password });
-      await verifyEmailAndRegister(email, password, verificationCode.trim());
+      await verifyEmailAndRegister(email, password.trim(), verificationCode.trim());
 
       Logger.info('ConfirmSignupScreen', 'Registration verified successfully');
       Alert.alert('Success', 'Your account has been created successfully. Please sign in.', [

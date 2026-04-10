@@ -11,6 +11,7 @@ interface PlaidLinkModalProps {
   linkToken: string | null;
   onClose: () => void;
   onSuccess?: () => void;
+  onError?: (errorMessage: string) => void;
 }
 
 const LINK_TOKEN_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
@@ -25,7 +26,8 @@ export default function PlaidLinkModal({
   isVisible, 
   linkToken: initialLinkToken,
   onClose, 
-  onSuccess 
+  onSuccess,
+  onError
 }: PlaidLinkModalProps) {
   // UI States
   const [isLoading, setIsLoading] = useState(false);
@@ -316,20 +318,27 @@ export default function PlaidLinkModal({
           cleanupSession();
           onClose();
         } else if (plaidResult.error) {
-          // 发生错误
+          // 发生错误：记录日志、调用外部 onError、然后直接关闭 Modal
           Logger.warn('PlaidLinkModal', 'Plaid error', { error: plaidResult.error });
-          setError(plaidResult.error);
-          setPlaidResult(null);
+          cleanupSession();
+          if (onError) {
+            onError(plaidResult.error);
+          }
+          onClose(); // 直接关闭，不再卡在 Try Again/Cancel 画面
         }
       } else if (plaidResult.type === 'timeout') {
         Logger.warn('PlaidLinkModal', 'Plaid operation timeout');
-        setError('Connection timeout. Please try again.');
-        setPlaidResult(null);
+        cleanupSession();
+        const timeoutMsg = 'Connection timeout. Please try again.';
+        if (onError) {
+          onError(timeoutMsg);
+        }
+        onClose();
       }
     };
 
     handleResult();
-  }, [plaidResult, confirmPlaidExchange, onClose, onSuccess, cleanupSession]);
+  }, [plaidResult, confirmPlaidExchange, onClose, onSuccess, onError, cleanupSession]);
 
   // ============================================================================
   // SECTION 6: 清理和重置

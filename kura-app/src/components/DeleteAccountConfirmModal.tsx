@@ -123,7 +123,7 @@ export const DeleteAccountConfirmModal: React.FC<DeleteAccountConfirmModalProps>
                   color: '#FFFFFF',
                   fontSize: 14,
                 }}
-                placeholder="Enter password"
+                placeholder="Enter your password to confirm"
                 placeholderTextColor="#9CA3AF"
                 secureTextEntry
                 value={password}

@@ -25,7 +25,6 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfirmSignup, setShowConfirmSignup] = useState(false);
 
   const sendVerificationCode = useAppStore((state) => state.sendVerificationCode);
@@ -49,7 +48,7 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
       Logger.debug('SignupScreen', 'Sending verification code', { email });
       await sendVerificationCode(email);
 
-      setIsSubmitted(true);
+      setShowConfirmSignup(true);
       
       Alert.alert('Check Your Email', 'We sent a verification code to your email address.');
     } catch (err) {
@@ -69,118 +68,6 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
         onNavigateToLogin={onNavigateToLogin}
         onBack={() => setShowConfirmSignup(false)}
       />
-    );
-  }
-
-  if (isSubmitted) {
-    return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#0B0B0F' }}>
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, justifyContent: 'center' }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Success State */}
-          <View style={{ alignItems: 'center' }}>
-            <View
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: 40,
-                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: 24,
-              }}
-            >
-              <Ionicons name="checkmark-circle" size={40} color="#22C55E" />
-            </View>
-
-            <Text style={{ fontSize: 20, fontWeight: '700', color: '#FFFFFF', marginBottom: 12 }}>
-              Check Your Email
-            </Text>
-
-            <Text
-              style={{
-                fontSize: 14,
-                color: '#CCCCCC',
-                textAlign: 'center',
-                marginBottom: 32,
-              }}
-            >
-              We sent a verification link to{'\n'}
-              <Text style={{ fontWeight: '600', color: '#FFFFFF' }}>{email}</Text>
-            </Text>
-
-            <Text
-              style={{
-                fontSize: 12,
-                color: '#999999',
-                textAlign: 'center',
-                marginBottom: 32,
-              }}
-            >
-              Enter the verification code in the email to complete your registration. The code will expire in 15 minutes.
-            </Text>
-
-            {/* Actions */}
-            <TouchableOpacity
-              onPress={onNavigateToLogin}
-              style={{
-                paddingVertical: 14,
-                borderRadius: 12,
-                backgroundColor: '#8B5CF6',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-                marginBottom: 12,
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>Back to Sign In</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                setIsSubmitted(false);
-                setEmail('');
-              }}
-              style={{
-                paddingVertical: 14,
-                borderRadius: 12,
-                backgroundColor: '#1A1A24',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-                borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.1)',
-                marginBottom: 12,
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#8B5CF6' }}>Try Another Email</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setShowConfirmSignup(true)}
-              style={{
-                paddingVertical: 12,
-                paddingHorizontal: 16,
-                backgroundColor: 'rgba(139, 92, 246, 0.15)',
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: '#8B5CF6',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-              }}
-            >
-              <Ionicons name="checkmark-outline" size={16} color="#8B5CF6" />
-              <Text style={{ fontSize: 14, color: '#8B5CF6', fontWeight: '600' }}>
-                Have a token? Complete signup
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
     );
   }
 
