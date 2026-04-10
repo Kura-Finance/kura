@@ -1,5 +1,4 @@
-const DEFAULT_BACKEND_URL =
-  process.env.NODE_ENV === 'production' ? 'https://kura-backend-642134687769.us-central1.run.app' : 'https://localhost:8080';
+// Backend URL must be set via NEXT_PUBLIC_BACKEND_URL environment variable
 const AUTH_TOKEN_KEY = 'kura.auth.token';
 
 export interface BackendUser {
@@ -85,7 +84,14 @@ export class BackendApiError extends Error {
 }
 
 export const getBackendBaseUrl = (): string => {
-  return process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_BACKEND_URL;
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  if (!backendUrl) {
+    throw new Error(
+      'NEXT_PUBLIC_BACKEND_URL environment variable is not set. ' +
+      'Please configure it in your environment or .env.local file.'
+    );
+  }
+  return backendUrl;
 };
 
 export const getStoredAuthToken = (): string | null => {

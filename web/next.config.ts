@@ -35,18 +35,25 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         {
           source: '/api/:path*',
-          destination: `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}/api/:path*`,
+          destination: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/:path*`,
         },
       ],
     };
   },
   
   async headers() {
-    // 生成动态的 CSP 头，包括后端 API 和应用自身的域名
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://kura-backend-642134687769.us-central1.run.app';
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kura-web-642134687769.us-central1.run.app';
+    // Both environment variables must be set for production
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
     
-    // 从 URL 提取基础域名
+    if (!backendUrl || !appUrl) {
+      console.warn(
+        'Warning: NEXT_PUBLIC_BACKEND_URL or NEXT_PUBLIC_APP_URL is not set. ' +
+        'CSP headers may be incomplete.'
+      );
+    }
+    
+    // Extract origin from URL
     const getOrigin = (url: string) => {
       try {
         const u = new URL(url);
@@ -59,7 +66,7 @@ const nextConfig: NextConfig = {
     const backendOrigin = getOrigin(backendUrl);
     const appOrigin = getOrigin(appUrl);
     
-    // 构建 CSP connect-src 指令
+    // Build CSP connect-src directive
     const connectSources = [
       "'self'",
       backendOrigin,

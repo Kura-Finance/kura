@@ -18,8 +18,12 @@ const getWalletMetadataUrl = () => {
   if (typeof window !== 'undefined') {
     return `${window.location.protocol}//${window.location.host}`;
   }
-  // Fallback to production URL if window is not available
-  return process.env.NEXT_PUBLIC_APP_URL || 'https://kura-web-642134687769.us-central1.run.app';
+  // Must use environment variable if window is not available
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) {
+    throw new Error('NEXT_PUBLIC_APP_URL environment variable is not set.');
+  }
+  return appUrl;
 }
 
 const createWagmiConfig = () => {
