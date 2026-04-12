@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, ScrollView, Text, RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '../../../shared/store/useFinanceStore';
 import { useExchangeStore } from '../../../shared/store/useExchangeStore';
 import { useAppStore } from '../../../shared/store/useAppStore';
@@ -14,6 +15,7 @@ import { useInitializePlaidData } from '../../../shared/hooks/useInitializePlaid
 import { useRefreshInvestmentData } from '../hooks/useRefreshInvestmentData';
 
 export default function InvestmentScreen() {
+  const { t } = useTranslation();
   // State Management - UI control
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [showConnectModal, setShowConnectModal] = useState(false);

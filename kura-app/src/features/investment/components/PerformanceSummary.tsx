@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import CurrencyDisplay from '../../../shared/components/CurrencyDisplay';
 import { useFinanceStore, AssetSnapshot } from '../../../shared/store/useFinanceStore';
 
@@ -79,6 +80,7 @@ function calculatePerformanceMetrics(
 export default function PerformanceSummary({ 
   timeRange = '1M',
 }: PerformanceSummaryProps) {
+  const { t } = useTranslation();
   const assetHistory = useFinanceStore((s) => s.assetHistory);
   const calculateTotalAssets = useFinanceStore((s) => s.calculateTotalAssets);
   
@@ -93,7 +95,7 @@ export default function PerformanceSummary({
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <View style={{ flex: 1 }}>
           <Text style={{ color: '#999999', fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.3 }}>
-            Total Assets
+            {t('investments.totalAssets')}
           </Text>
           <CurrencyDisplay 
             value={metrics.currentTotal} 
@@ -125,8 +127,8 @@ export default function PerformanceSummary({
       
       <Text style={{ color: '#666666', fontSize: 14, marginTop: 12 }}>
         {assetHistory.length > 0
-          ? `Updated ${new Date(assetHistory[assetHistory.length - 1].timestamp).toLocaleDateString()}`
-          : 'No performance data yet'}
+          ? `${t('investments.updated')} ${new Date(assetHistory[assetHistory.length - 1].timestamp).toLocaleDateString()}`
+          : t('investments.noPerformanceData')}
       </Text>
     </View>
   );

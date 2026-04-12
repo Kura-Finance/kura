@@ -46,11 +46,20 @@ export interface BackendFinanceInvestment {
   logo: string;
 }
 
+export interface RefreshInfo {
+  refreshedAt: string; // ISO string timestamp
+  refreshCountRemaining: number;
+  refreshLimit: number;
+  nextResetAt: string; // ISO string timestamp
+}
+
 export interface BackendFinanceSnapshot {
   accounts: BackendFinanceAccount[];
   transactions: BackendFinanceTransaction[];
   investmentAccounts: BackendFinanceInvestmentAccount[];
   investments: BackendFinanceInvestment[];
+  _cacheSource?: string; // '來自緩存' or '強制刷新，來自 Plaid API'
+  _refreshInfo?: RefreshInfo; // Only present on refresh=true responses
 }
 
 export interface UpdatePlaidAccountOrderPayload {
@@ -158,10 +167,15 @@ export const exchangePlaidPublicToken = (
 /**
  * 获取财务数据快照
  * 包括银行账户、交易、投资账户和投资产品
+ * 
+ * @param token - Authentication token
+ * @param refresh - If true, forces a refresh from Plaid API (consumes daily quota)
+ *                  If false (default), returns cached data from database (unlimited)
  */
-export const fetchPlaidFinanceSnapshot = (token: string): Promise<BackendFinanceSnapshot> => {
+export const fetchPlaidFinanceSnapshot = (token: string, refresh: boolean = false): Promise<BackendFinanceSnapshot> => {
+  const queryParam = refresh ? '?refresh=true' : '';
   return plaidRequest<BackendFinanceSnapshot>(
-    '/api/plaid/finance-snapshot',
+    `/api/plaid/finance-snapshot${queryParam}`,
     { method: 'GET' },
     token
   );

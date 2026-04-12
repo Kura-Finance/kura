@@ -1,6 +1,17 @@
 import { ExchangeName } from '../../api/exchangeApi';
 
 // ============================================================================
+// Refresh Info Type
+// ============================================================================
+
+export interface RefreshInfo {
+  refreshedAt: string; // ISO string timestamp
+  refreshCountRemaining: number;
+  refreshLimit: number;
+  nextResetAt: string; // ISO string timestamp
+}
+
+// ============================================================================
 // 基礎資料型別
 // ============================================================================
 
@@ -137,8 +148,12 @@ export interface PlaidState {
   isLoadingPlaidData: boolean;
   plaidError: string | null;
 
+  // Refresh tracking (for quota management)
+  lastRefreshInfo: RefreshInfo | null;
+  cacheSource: string | null; // '來自緩存' or '強制刷新，來自 Plaid API'
+
   // Actions
-  hydratePlaidFinanceData: (token: string) => Promise<void>;
+  hydratePlaidFinanceData: (token: string, refresh?: boolean) => Promise<void>;
   clearPlaidFinanceData: () => void;
   hydrateExchangeAccounts: (token: string) => Promise<void>;
 }

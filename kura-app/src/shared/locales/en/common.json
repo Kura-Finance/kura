@@ -49,7 +49,14 @@
     "today": "Today",
     "thisMonth": "This Month",
     "thisYear": "This Year",
-    "allTime": "All Time"
+    "allTime": "All Time",
+    "allAccounts": "All Accounts",
+    "recentTransactions": "Recent Transactions",
+    "transactionHistory": "Transaction History",
+    "savingsTransactions": "Savings Transactions",
+    "transferRecords": "Transfer Records",
+    "budget": "Budget",
+    "manageSpending": "Manage Spending"
   },
   "accounts": {
     "title": "Accounts",
@@ -78,7 +85,18 @@
     "gainPercent": "Gain %",
     "unrealizedGain": "Unrealized Gain",
     "realizedGain": "Realized Gain",
-    "addInvestment": "Add Investment"
+    "addInvestment": "Add Investment",
+    "performance": "Performance",
+    "connectAccount": "Connect Account",
+    "addAccount": "Add Account",
+    "errorLoadingExchange": "Failed to load exchange data",
+    "totalAssets": "Total Assets",
+    "updated": "Updated",
+    "noPerformanceData": "No performance data yet",
+    "allHoldings": "All Holdings",
+    "all": "All",
+    "noHoldingsFound": "No holdings found",
+    "units": "units"
   },
   "settings": {
     "title": "Settings",

@@ -1,5 +1,5 @@
 import { StateCreator } from 'zustand';
-import { PlaidState, FinanceState } from './types';
+import { PlaidState, FinanceState, RefreshInfo } from './types';
 import { fetchPlaidFinanceSnapshot } from '../../api/plaidApi';
 import Logger from '../../utils/Logger';
 
@@ -11,21 +11,25 @@ export const createPlaidSlice: StateCreator<FinanceState, [], [], PlaidState> = 
   // Initial State
   isLoadingPlaidData: false,
   plaidError: null,
+  lastRefreshInfo: null,
+  cacheSource: null,
 
   // ========================================================================
   // Plaid Data Hydration
   // ========================================================================
 
-  hydratePlaidFinanceData: async (token: string) => {
+  hydratePlaidFinanceData: async (token: string, refresh: boolean = false) => {
     try {
       set({ isLoadingPlaidData: true, plaidError: null });
-      Logger.debug('PlaidSlice', 'Fetching Plaid finance snapshot');
+      Logger.debug('PlaidSlice', 'Fetching Plaid finance snapshot', { refresh });
 
-      const snapshot = await fetchPlaidFinanceSnapshot(token);
+      const snapshot = await fetchPlaidFinanceSnapshot(token, refresh);
       Logger.info('PlaidSlice', 'Plaid snapshot fetched successfully', {
         accountsCount: snapshot.accounts.length,
         transactionsCount: snapshot.transactions.length,
         investmentAccountsCount: snapshot.investmentAccounts.length,
+        cacheSource: snapshot._cacheSource,
+        hasRefreshInfo: !!snapshot._refreshInfo,
       });
 
       set((state) => {
@@ -48,6 +52,8 @@ export const createPlaidSlice: StateCreator<FinanceState, [], [], PlaidState> = 
           investmentAccounts: [...snapshot.investmentAccounts, ...nonPlaidAccounts],
           investments: [...snapshot.investments, ...nonPlaidInvestments],
           isLoadingPlaidData: false,
+          lastRefreshInfo: snapshot._refreshInfo || null,
+          cacheSource: snapshot._cacheSource || null,
         };
       });
     } catch (error) {

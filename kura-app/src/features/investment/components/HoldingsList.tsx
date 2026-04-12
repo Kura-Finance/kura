@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import HoldingCard from './HoldingCard';
 
 interface Investment {
@@ -21,6 +22,7 @@ interface HoldingsListProps {
 }
 
 export default function HoldingsList({ investments, selectedAccountId }: HoldingsListProps) {
+  const { t } = useTranslation();
   const [selectedFilter, setSelectedFilter] = useState<AssetClassFilter>('All');
 
   // Filter investments based on selected asset class
@@ -51,7 +53,7 @@ export default function HoldingsList({ investments, selectedAccountId }: Holding
     <View style={{ paddingHorizontal: 24 }}>
       <View style={{ marginBottom: 16 }}>
         <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 12 }}>
-          {selectedAccountId ? `Holdings (${filteredInvestments.length})` : `All Holdings (${filteredInvestments.length})`}
+          {selectedAccountId ? `${t('investments.holdings')} (${filteredInvestments.length})` : `${t('investments.allHoldings')} (${filteredInvestments.length})`}
         </Text>
 
         {/* Asset Class Filter Tabs */}
@@ -91,7 +93,7 @@ export default function HoldingsList({ investments, selectedAccountId }: Holding
         </View>
       ) : (
         <View style={{ paddingVertical: 24, alignItems: 'center', paddingHorizontal: 16, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', borderColor: 'rgba(255,255,255,0.15)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-          <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>No holdings found</Text>
+          <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>{t('investments.noHoldingsFound')}</Text>
         </View>
       )}
     </View>

@@ -23,11 +23,11 @@ export function useRefreshInvestmentData() {
 
     setRefreshing(true);
     try {
-      Logger.debug('useRefreshInvestmentData', 'Refreshing investment data');
+      Logger.debug('useRefreshInvestmentData', 'Refreshing investment data with forced Plaid refresh');
 
-      // Refresh Plaid data
-      await hydratePlaidFinanceData(authToken);
-      Logger.info('useRefreshInvestmentData', 'Plaid data refreshed');
+      // Refresh Plaid data with refresh=true to force update from API (consumes daily quota)
+      await hydratePlaidFinanceData(authToken, true);
+      Logger.info('useRefreshInvestmentData', 'Plaid data refreshed from API');
 
       // Refresh Exchange data for all connected accounts
       if (exchangeAccounts.length > 0) {

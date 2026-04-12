@@ -12,22 +12,10 @@ export const metadata: Metadata = {
   authors: [{ name: "Kura" }],
   manifest: "/manifest.json",
   icons: {
-    icon: [
-      { url: '/ios/AppIcon.appiconset/icon-1024.png', sizes: '1024x1024', type: 'image/png' },
-      { url: '/favicon.ico', sizes: '32x32' },
-    ],
-    shortcut: '/favicon.ico',
+    icon: '/icon.png', // Created by icon.ts
     apple: [
       { url: '/ios/AppIcon.appiconset/icon-60@3x.png', sizes: '180x180', type: 'image/png' },
       { url: '/ios/AppIcon.appiconset/icon-60@2x.png', sizes: '120x120', type: 'image/png' },
-    ],
-    other: [
-      {
-        rel: 'icon',
-        url: '/android/mipmap-xxxhdpi/ic_launcher.png',
-        sizes: 'any',
-        type: 'image/png',
-      },
     ],
   },
   openGraph: {

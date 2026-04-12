@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import CurrencyDisplay from '../../../shared/components/CurrencyDisplay';
 
 interface Investment {
@@ -18,6 +19,7 @@ interface HoldingCardProps {
 }
 
 export default function HoldingCard({ investment, totalValue }: HoldingCardProps) {
+  const { t } = useTranslation();
   // Use usdValue directly from investment
   const positionValue = investment.usdValue ?? (investment.holdings * investment.currentPrice);
   const percentageOfTotal = totalValue > 0 ? (positionValue / totalValue) * 100 : 0;
@@ -43,7 +45,7 @@ export default function HoldingCard({ investment, totalValue }: HoldingCardProps
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>{investment.symbol}</Text>
-          <Text style={{ color: '#999999', fontSize: 11, marginTop: 2 }}>{(investment.holdings ?? 0).toFixed(4)} units • {(percentageOfTotal ?? 0).toFixed(1)}%</Text>
+          <Text style={{ color: '#999999', fontSize: 11, marginTop: 2 }}>{(investment.holdings ?? 0).toFixed(4)} {t('investments.units')} • {(percentageOfTotal ?? 0).toFixed(1)}%</Text>
         </View>
       </View>
       <View style={{ alignItems: 'flex-end' }}>

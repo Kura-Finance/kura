@@ -323,7 +323,7 @@ export default function MembershipScreen({ navigation }: MembershipScreenProps) 
                     paddingVertical: 8,
                     paddingHorizontal: 12,
                     borderRadius: 6,
-                    backgroundColor: billingCycle === 'monthly' ? '#8B5CF6' : 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: billingCycle === 'monthly' ? currentTier.color : 'rgba(255, 255, 255, 0.05)',
                     borderWidth: billingCycle === 'monthly' ? 0 : 1,
                     borderColor: '#333333',
                   }}
@@ -344,7 +344,7 @@ export default function MembershipScreen({ navigation }: MembershipScreenProps) 
                     paddingVertical: 8,
                     paddingHorizontal: 12,
                     borderRadius: 6,
-                    backgroundColor: billingCycle === 'annual' ? '#8B5CF6' : 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: billingCycle === 'annual' ? currentTier.color : 'rgba(255, 255, 255, 0.05)',
                     borderWidth: billingCycle === 'annual' ? 0 : 1,
                     borderColor: '#333333',
                   }}
@@ -379,7 +379,7 @@ export default function MembershipScreen({ navigation }: MembershipScreenProps) 
                 color: '#FFFFFF',
               }}
             >
-              {selectedTier === 'vip' ? t('membership.contactSales') : `${t('membership.upgradeTo')} ${currentTier.name.split(' ')[1]}`}
+              {selectedTier === 'vip' ? t('membership.contactSales') : `${t('membership.upgradeTo')} ${currentTier.name}`}
             </Text>
           </TouchableOpacity>
         </View>

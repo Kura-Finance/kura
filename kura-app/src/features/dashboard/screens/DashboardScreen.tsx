@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Text, RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useFinanceStore } from '../../../shared/store/useFinanceStore';
 import AccountsList from '../components/AccountsList';
 import ActivityContainer from '../components/ActivityContainer';
@@ -8,6 +9,7 @@ import { useInitializePlaidData } from '../../../shared/hooks/useInitializePlaid
 import { useRefreshDashboardData } from '../hooks/useRefreshDashboardData';
 
 export default function DashboardScreen() {
+  const { t } = useTranslation();
   // State Management - UI control
   const [selectedAccountId, setSelectedAccountId] = useState<string>('all');
   const [showTransactionsDetail, setShowTransactionsDetail] = useState(false);
@@ -28,16 +30,16 @@ export default function DashboardScreen() {
   }, [accounts]);
 
   const selectedAccount = selectedAccountId === 'all'
-    ? { id: 'all', type: 'all' as const, name: 'All Accounts' }
+    ? { id: 'all', type: 'all' as const, name: t('dashboard.allAccounts') }
     : accounts.find((account) => account.id === selectedAccountId);
 
   const transactionHeader = selectedAccount?.type === 'all'
-    ? 'Recent Transactions'
+    ? t('dashboard.recentTransactions')
     : selectedAccount?.type === 'credit'
-      ? 'Transaction History'
+      ? t('dashboard.transactionHistory')
       : selectedAccount?.type === 'saving'
-        ? 'Savings Transactions'
-        : 'Transfer Records';
+        ? t('dashboard.savingsTransactions')
+        : t('dashboard.transferRecords');
 
   const displayTransactions = useMemo(() => {
     if (selectedAccountId === 'all') {
@@ -100,8 +102,8 @@ export default function DashboardScreen() {
           }}
         >
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF', marginBottom: 4 }}>Budget</Text>
-            <Text style={{ fontSize: 11, fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: 0.5 }}>Manage Spending</Text>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF', marginBottom: 4 }}>{t('dashboard.budget')}</Text>
+            <Text style={{ fontSize: 11, fontWeight: '500', color: '#999999', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('dashboard.manageSpending')}</Text>
           </View>
           <Text style={{ fontSize: 24, color: '#8B5CF6' }}>→</Text>
         </TouchableOpacity>

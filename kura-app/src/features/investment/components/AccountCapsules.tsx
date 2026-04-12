@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, Image, TouchableOpacity, Text } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface Account {
   id: string;
@@ -16,6 +17,7 @@ interface AccountCapsulesProps {
 }
 
 export default function AccountCapsules({ accounts, selectedAccountId, onSelectAccount, onAddAccount }: AccountCapsulesProps) {
+  const { t } = useTranslation();
 
   return (
     <ScrollView
@@ -34,7 +36,7 @@ export default function AccountCapsules({ accounts, selectedAccountId, onSelectA
           borderColor: selectedAccountId === null ? '#8B5CF6' : 'rgba(255,255,255,0.1)',
         }}
       >
-        <Text style={{ color: '#FFFFFF', fontSize: 13, fontWeight: '600' }}>All</Text>
+        <Text style={{ color: '#FFFFFF', fontSize: 13, fontWeight: '600' }}>{t('investments.all')}</Text>
       </TouchableOpacity>
 
       {accounts.map((account) => (
