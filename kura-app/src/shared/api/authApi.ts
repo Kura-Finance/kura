@@ -80,28 +80,83 @@ export const getBackendBaseUrl = (): string => {
 export const getStoredAuthToken = async (): Promise<string | null> => {
   try {
     const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+    if (token) {
+      Logger.debug('AuthAPI', '✅ Auth token retrieved from AsyncStorage', {
+        tokenLength: token.length,
+      });
+    } else {
+      Logger.debug('AuthAPI', '⚪ No auth token found in AsyncStorage');
+    }
     return token;
   } catch (error) {
-    Logger.warn('AuthAPI', 'AsyncStorage unavailable, using in-memory fallback', { error });
-    return memoryStorage[AUTH_TOKEN_KEY] || null;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    Logger.error('AuthAPI', '❌ CRITICAL: AsyncStorage getItem failed - token persistence broken', {
+      error: errorMessage,
+      errorType: error instanceof Error ? error.name : typeof error,
+      suggestion: 'Check device storage permissions, available space, or AsyncStorage initialization',
+    });
+    
+    // Fallback: only use in-memory storage if available
+    const fallbackToken = memoryStorage[AUTH_TOKEN_KEY] || null;
+    if (fallbackToken) {
+      Logger.warn('AuthAPI', '⚠️ Using in-memory auth token (will be lost on app restart)', {
+        tokenLength: fallbackToken.length,
+      });
+    }
+    return fallbackToken;
   }
 };
 
 export const setStoredAuthToken = async (token: string): Promise<void> => {
   try {
+    // Validate token before saving
+    if (!token || typeof token !== 'string') {
+      throw new Error('Invalid token: must be a non-empty string');
+    }
+
     await AsyncStorage.setItem(AUTH_TOKEN_KEY, token);
-  } catch (error) {
-    Logger.warn('AuthAPI', 'AsyncStorage unavailable, using in-memory fallback', { error });
+    Logger.info('AuthAPI', '✅ Auth token saved to AsyncStorage successfully', {
+      tokenLength: token.length,
+    });
+    
+    // Also keep in-memory backup
     memoryStorage[AUTH_TOKEN_KEY] = token;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    Logger.error('AuthAPI', '❌ CRITICAL: AsyncStorage setItem failed - token NOT persisted', {
+      error: errorMessage,
+      errorType: error instanceof Error ? error.name : typeof error,
+      suggestion: 'Check device storage permissions, available space, or AsyncStorage initialization',
+    });
+    
+    // Try in-memory fallback as last resort
+    try {
+      memoryStorage[AUTH_TOKEN_KEY] = token;
+      Logger.warn('AuthAPI', '⚠️ Token saved to in-memory storage only (will be lost on app restart)', {
+        tokenLength: token.length,
+      });
+    } catch (memoryError) {
+      Logger.error('AuthAPI', '❌ CRITICAL: Failed to save token anywhere (in-memory and AsyncStorage both failed)', {
+        error: memoryError instanceof Error ? memoryError.message : String(memoryError),
+      });
+      throw new Error('Failed to persist authentication token');
+    }
   }
 };
 
 export const clearStoredAuthToken = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(AUTH_TOKEN_KEY);
+    Logger.info('AuthAPI', '✅ Auth token cleared from AsyncStorage');
   } catch (error) {
-    Logger.warn('AuthAPI', 'AsyncStorage unavailable, using in-memory fallback', { error });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    Logger.warn('AuthAPI', '⚠️ AsyncStorage removeItem failed, clearing in-memory token', {
+      error: errorMessage,
+    });
+  } finally {
+    // Always clear in-memory storage
     delete memoryStorage[AUTH_TOKEN_KEY];
+    Logger.debug('AuthAPI', 'In-memory auth token cleared');
   }
 };
 

@@ -59,7 +59,6 @@ export default function LoginScreen({
       await login(email, password);
 
       Logger.info('LoginScreen', 'Login successful');
-      Alert.alert('Success', 'Logged in successfully');
       onLoginSuccess?.();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
