@@ -16,9 +16,9 @@ export default function RootHubPage() {
             Open Dashboard
           </Link>
           
-          <button className="px-8 py-4 bg-[#1A1A24] border border-white/5 text-gray-400 font-semibold rounded-xl cursor-not-allowed">
-            Rewards (Soon)
-          </button>
+          <Link href="/about" className="px-8 py-4 bg-[#1A1A24] border border-white/5 text-gray-400 font-semibold rounded-xl hover:border-[#8B5CF6]/30 transition-colors">
+            About Us
+          </Link>
         </div>
       </div>
     </div>
