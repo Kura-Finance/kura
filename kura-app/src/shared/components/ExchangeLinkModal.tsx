@@ -42,7 +42,7 @@ export default function ExchangeLinkModal({
 }: ExchangeLinkModalProps) {
   const { authToken } = useAppStore();
   const { addExchangeAccount } = useFinanceStore();
-  const { fetchExchangeBalances } = useExchangeStore();
+  const { fetchExchangeBalances, addExchangeAccount: addExchangeAccountToStore } = useExchangeStore();
 
   const [step, setStep] = useState<'select' | 'credentials'>('select');
   const [supportedExchanges, setSupportedExchanges] = useState<SupportedExchange[]>([]);
@@ -173,8 +173,9 @@ export default function ExchangeLinkModal({
         return;
       }
 
-      // Add to store - connectedAccount already has all required fields
+      // Add to both stores - connectedAccount already has all required fields
       addExchangeAccount(connectedAccount);
+      addExchangeAccountToStore(connectedAccount);
 
       // Attempt to fetch initial balances
       try {

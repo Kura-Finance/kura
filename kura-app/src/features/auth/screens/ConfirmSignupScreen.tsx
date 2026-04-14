@@ -119,99 +119,108 @@ export default function ConfirmSignupScreen({
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
-          scrollEnabled={false}
         >
-          <View style={{ flex: 1, paddingHorizontal: 24, justifyContent: 'center' }}>
-            {/* Header */}
-            <View style={{ marginBottom: 40, alignItems: 'center' }}>
-              <TouchableOpacity
-                onPress={onBack}
+          <View style={{ flex: 1, paddingHorizontal: 24, justifyContent: 'space-between' }}>
+            {/* ===== TOP SECTION: Title and Form ===== */}
+            <View>
+              {/* Title: Complete Your Account */}
+              <Text
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: '#1A1A24',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginBottom: 24,
-                  alignSelf: 'flex-start',
+                  fontSize: 32,
+                  fontWeight: '700',
+                  color: '#FFFFFF',
+                  textAlign: 'center',
+                  marginTop: 24,
+                  marginBottom: 8,
                 }}
               >
-                <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-
-              <Text style={{ fontSize: 24, fontWeight: '700', color: '#FFFFFF', marginBottom: 8 }}>
-                Complete Your Account
+                Complete Account
               </Text>
-              <Text style={{ fontSize: 14, color: '#999999', textAlign: 'center' }}>
+
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: '#999999',
+                  textAlign: 'center',
+                  marginBottom: 32,
+                }}
+              >
                 Create your password to activate your account
               </Text>
-              <Text style={{ fontSize: 12, color: '#666666', marginTop: 12 }}>
+
+              {/* Verifying Email Info */}
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#999999',
+                  textAlign: 'center',
+                  marginBottom: 24,
+                }}
+              >
                 Verifying: <Text style={{ color: '#8B5CF6', fontWeight: '600' }}>{email}</Text>
               </Text>
-            </View>
 
-            {/* Verification Code Input */}
-            <View style={{ marginBottom: 20 }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600' }}>
-                  Verification Code
-                </Text>
-                <TouchableOpacity onPress={handlePasteCode} disabled={isLoading}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                    <Ionicons name="clipboard-outline" size={14} color="#8B5CF6" />
-                    <Text style={{ fontSize: 11, color: '#8B5CF6', fontWeight: '600' }}>Paste</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  borderWidth: 1,
-                  borderColor: 'rgba(255, 255, 255, 0.1)',
-                  borderRadius: 12,
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  backgroundColor: '#1A1A24',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-              >
-                <Ionicons name="shield-checkmark-outline" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
-                <TextInput
-                  placeholder="Enter verification code"
-                  placeholderTextColor="#666666"
-                  value={verificationCode}
-                  onChangeText={setVerificationCode}
-                  autoCapitalize="none"
-                  editable={!isLoading}
-                  selectTextOnFocus={true}
+              {/* Error Message */}
+              {error && (
+                <View
                   style={{
-                    flex: 1,
-                    color: '#FFFFFF',
-                    fontSize: 14,
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderRadius: 8,
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(239, 68, 68, 0.3)',
+                    marginBottom: 20,
                   }}
-                />
-              </View>
-            </View>
+                >
+                  <Text style={{ fontSize: 12, color: '#FCA5A5' }}>{error}</Text>
+                </View>
+              )}
 
-            {/* Error Message */}
-            {error && (
-              <View
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 10,
-                  borderRadius: 8,
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(239, 68, 68, 0.3)',
-                  marginBottom: 16,
-                }}
-              >
-                <Text style={{ fontSize: 12, color: '#FCA5A5' }}>{error}</Text>
+              {/* Verification Code Input */}
+              <View style={{ marginBottom: 20 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600' }}>
+                    Verification Code
+                  </Text>
+                  <TouchableOpacity onPress={handlePasteCode} disabled={isLoading}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <Ionicons name="clipboard-outline" size={14} color="#8B5CF6" />
+                      <Text style={{ fontSize: 11, color: '#8B5CF6', fontWeight: '600' }}>Paste</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: 12,
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    backgroundColor: '#1A1A24',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Ionicons name="shield-checkmark-outline" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+                  <TextInput
+                    placeholder="Enter verification code"
+                    placeholderTextColor="#666666"
+                    value={verificationCode}
+                    onChangeText={setVerificationCode}
+                    autoCapitalize="none"
+                    editable={!isLoading}
+                    selectTextOnFocus={true}
+                    style={{
+                      flex: 1,
+                      color: '#FFFFFF',
+                      fontSize: 14,
+                    }}
+                  />
+                </View>
               </View>
-            )}
 
-            {/* Password Input */}
+              {/* Password Input */}
             <View style={{ marginBottom: 20 }}>
               <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
                 Password
@@ -301,39 +310,47 @@ export default function ConfirmSignupScreen({
                 </TouchableOpacity>
               </View>
             </View>
+            </View>
 
-            {/* Submit Button */}
-            <TouchableOpacity
-              onPress={handleConfirmSignup}
-              disabled={isLoading}
-              style={{
-                paddingVertical: 14,
-                borderRadius: 12,
-                backgroundColor: '#8B5CF6',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: 16,
-                opacity: isLoading ? 0.6 : 1,
-              }}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <Text style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>
-                  Create Account
+            {/* ===== MIDDLE: Spacer (flex grows) ===== */}
+            <View style={{ flex: 1 }} />
+
+            {/* ===== BOTTOM SECTION: Action Buttons ===== */}
+            <View style={{ marginBottom: 24 }}>
+              {/* Submit Button */}
+              <TouchableOpacity
+                onPress={handleConfirmSignup}
+                disabled={isLoading}
+                style={{
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  backgroundColor: '#8B5CF6',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginBottom: 24,
+                  opacity: isLoading ? 0.6 : 1,
+                }}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>
+                    Create Account
+                  </Text>
+                )}
+              </TouchableOpacity>
+
+              {/* Back Link */}
+              <TouchableOpacity onPress={onBack} disabled={isLoading}>
+                <Text style={{ fontSize: 13, color: '#8B5CF6', fontWeight: '600', textAlign: 'center' }}>
+                  Back to Email Verification
                 </Text>
-              )}
-            </TouchableOpacity>
-
-            {/* Back Link */}
-            <TouchableOpacity onPress={onBack} disabled={isLoading}>
-              <Text style={{ fontSize: 14, color: '#8B5CF6', fontWeight: '600', textAlign: 'center' }}>
-                Back to Email Verification
-              </Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+

@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
-import Purchases from 'react-native-purchases';
+// import Purchases from 'react-native-purchases';
 import { useAppTranslation } from '../../../shared/hooks/useAppTranslation';
 import { useAppStore } from '../../../shared/store/useAppStore';
-import { getPurchaseErrorMessage } from '../../../shared/config/RevenueCatConfig';
+// import { getPurchaseErrorMessage } from '../../../shared/config/RevenueCatConfig';
 
 type MembershipTier = 'basic' | 'pro' | 'ultimate' | 'vip';
 
@@ -318,13 +318,13 @@ export default function MembershipScreen({ navigation }: MembershipScreenProps) 
       // ]);
       /* ===== END OF COMMENTED PURCHASE LOGIC ===== */
     } catch (error) {
-      const errorMessage = getPurchaseErrorMessage(error);
+      // const errorMessage = getPurchaseErrorMessage(error);
       
-      Alert.alert(
-        'Purchase Failed',
-        errorMessage,
-        [{ text: 'OK', onPress: () => setIsPurchasing(false) }]
-      );
+      // Alert.alert(
+      //   'Purchase Failed',
+      //   errorMessage,
+      //   [{ text: 'OK', onPress: () => setIsPurchasing(false) }]
+      // );
     }
   };
 
@@ -407,10 +407,9 @@ export default function MembershipScreen({ navigation }: MembershipScreenProps) 
       <View
         style={{
           flexDirection: 'row',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           paddingHorizontal: 16,
           paddingVertical: 12,
-          paddingTop: Math.max(insets.top || 0, 12),
           borderBottomWidth: 1,
           borderBottomColor: '#333333',
         }}
