@@ -47,12 +47,12 @@ export default function AboutPage() {
 
       {/* Main content */}
       <motion.main
-        className="flex-1 flex items-center justify-center px-4 sm:px-6 py-16 overflow-y-auto z-10"
+        className="flex-1 px-4 sm:px-6 py-16 overflow-y-auto z-10 w-full"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <div className="w-full max-w-5xl">
+        <div className="w-full max-w-5xl mx-auto">
           {/* Hero Section */}
           <motion.section className="mb-24" variants={itemVariants}>
             <div className="relative rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent backdrop-blur-xl p-12 sm:p-16 text-center overflow-hidden">
