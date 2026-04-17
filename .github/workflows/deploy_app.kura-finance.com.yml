@@ -7,7 +7,7 @@ on:
       - master
     paths:
       - 'app.kura-finance.com/**'
-      - '.github/workflows/deploy_web.yml'
+      - '.github/workflows/deploy_app.kura-finance.com.yml'
   workflow_dispatch:
 
 env:
