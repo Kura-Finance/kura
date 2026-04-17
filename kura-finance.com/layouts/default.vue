@@ -1,3 +1,9 @@
-# Nuxt Layout
+<template>
+  <div>
+    <slot />
+  </div>
+</template>
 
-This layout file is used for all pages in the Nuxt app by default.
+<script setup lang="ts">
+// Default layout for all pages
+</script>
