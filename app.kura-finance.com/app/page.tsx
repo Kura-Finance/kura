@@ -15,10 +15,6 @@ export default function RootHubPage() {
           <Link href="/dashboard" className="px-8 py-4 bg-[#8B5CF6] text-white font-semibold rounded-xl hover:bg-[#A78BFA] transition-colors shadow-[0_0_20px_rgba(139,92,246,0.3)]">
             Open Dashboard
           </Link>
-          
-          <Link href="/about" className="px-8 py-4 bg-[#1A1A24] border border-white/5 text-gray-400 font-semibold rounded-xl hover:border-[#8B5CF6]/30 transition-colors">
-            About Us
-          </Link>
         </div>
       </div>
     </div>

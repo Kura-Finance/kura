@@ -6,7 +6,7 @@ on:
       - main
       - master
     paths:
-      - 'web/**'
+      - 'app.kura-finance.com/**'
       - '.github/workflows/deploy_web.yml'
   workflow_dispatch:
 

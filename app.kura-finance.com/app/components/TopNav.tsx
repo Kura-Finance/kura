@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import UserSettingsDrawer from './UserSettingsDrawer';
 import { useAppStore } from '@/store/useAppStore';
@@ -17,7 +18,7 @@ export default function TopNav() {
       <header className="w-full flex justify-between items-center px-6 py-2.5 border-b border-[#1A1A24] bg-[#0B0B0F]/80 backdrop-blur-md z-40 shrink-0 sticky top-0">
         
         {/* 左側 Logo */}
-        <div className="text-lg font-bold text-white flex items-center gap-2">
+        <Link href="/" className="text-lg font-bold text-white flex items-center gap-2 hover:opacity-80 transition-opacity">
           <Image
             src="/logo.svg"
             alt="Kura Logo"
@@ -26,7 +27,7 @@ export default function TopNav() {
             className="w-8 h-8"
           />
           Kura
-        </div>
+        </Link>
 
         {/* 右側控制區 */}
         <div className="flex items-center gap-4">

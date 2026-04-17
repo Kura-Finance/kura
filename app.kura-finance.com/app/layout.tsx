@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import TopNav from "./components/TopNav";
-import Footer from "./components/Footer";
 import Web3ModalProvider from '@/context/Web3ModalProvider';
 
 export const metadata: Metadata = {
@@ -78,12 +77,9 @@ export default function RootLayout({
           <TopNav />
           
           {/* 把空間完全交給 children (也就是 dashboard 的 layout) */}
-          <div className="flex flex-1 overflow-hidden">
+          <div className="flex flex-1 overflow-hidden min-h-[calc(100vh-4rem)]">
             {children}
           </div>
-
-          {/* 全域 Footer */}
-          <Footer />
         </Web3ModalProvider>
         
       </body>
