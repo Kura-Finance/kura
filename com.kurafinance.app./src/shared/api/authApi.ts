@@ -203,13 +203,23 @@ async function apiRequest<T>(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const errorStack = error instanceof Error ? error.stack : undefined;
     
-    Logger.error('AuthAPI', 'Request failed', {
+    // More detailed error diagnostics
+    let errorDetails: any = {
       url,
       method: options.method || 'GET',
       hasToken: !!token,
       error: errorMessage,
       stack: errorStack,
-    });
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
+    };
+    
+    // Add network-specific error info
+    if (error instanceof TypeError) {
+      errorDetails.networkError = true;
+      errorDetails.suggestion = 'Check if backend URL is reachable, SSL cert is valid, or network connection exists';
+    }
+    
+    Logger.error('AuthAPI', 'Request failed', errorDetails);
     throw error;
   }
 }

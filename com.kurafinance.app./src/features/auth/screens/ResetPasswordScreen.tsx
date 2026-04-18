@@ -17,16 +17,18 @@ import Logger from '../../../shared/utils/Logger';
 
 interface ResetPasswordWithTokenScreenProps {
   initialToken?: string;
+  initialEmail?: string;
   onNavigateToLogin?: () => void;
   onBack?: () => void;
 }
 
 export default function ResetPasswordWithTokenScreen({
   initialToken = '',
+  initialEmail = '',
   onNavigateToLogin,
   onBack,
 }: ResetPasswordWithTokenScreenProps) {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(initialEmail);
   const [resetToken, setResetToken] = useState(initialToken);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -136,41 +138,64 @@ export default function ResetPasswordWithTokenScreen({
               )}
 
               {/* Email Input */}
-              <View style={{ marginBottom: 20 }}>
-                <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
-                  Email
-                </Text>
-                <View
-                  style={{
-                    borderWidth: 1,
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: 12,
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
-                    backgroundColor: '#1A1A24',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Ionicons name="mail-outline" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
-                  <TextInput
-                    placeholder="your@email.com"
-                    placeholderTextColor="#666666"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    textContentType="emailAddress"
-                    autoComplete="email"
-                    autoCapitalize="none"
-                    editable={!isLoading}
+              {!initialEmail ? (
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
+                    Email
+                  </Text>
+                  <View
                     style={{
-                      flex: 1,
-                      color: '#FFFFFF',
-                      fontSize: 14,
+                      borderWidth: 1,
+                      borderColor: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 12,
+                      backgroundColor: '#1A1A24',
+                      flexDirection: 'row',
+                      alignItems: 'center',
                     }}
-                  />
+                  >
+                    <Ionicons name="mail-outline" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+                    <TextInput
+                      placeholder="your@email.com"
+                      placeholderTextColor="#666666"
+                      value={email}
+                      onChangeText={setEmail}
+                      keyboardType="email-address"
+                      textContentType="emailAddress"
+                      autoComplete="email"
+                      autoCapitalize="none"
+                      editable={!isLoading}
+                      style={{
+                        flex: 1,
+                        color: '#FFFFFF',
+                        fontSize: 14,
+                      }}
+                    />
+                  </View>
                 </View>
-              </View>
+              ) : (
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
+                    Email
+                  </Text>
+                  <View
+                    style={{
+                      borderWidth: 1,
+                      borderColor: 'rgba(34, 197, 94, 0.3)',
+                      borderRadius: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 12,
+                      backgroundColor: 'rgba(34, 197, 94, 0.05)',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Ionicons name="checkmark-circle" size={18} color="#22C55E" style={{ marginRight: 8 }} />
+                    <Text style={{ flex: 1, color: '#FFFFFF', fontSize: 14 }}>{email}</Text>
+                  </View>
+                </View>
+              )}
 
               {/* Reset Token Input */}
               <View style={{ marginBottom: 20 }}>
@@ -313,7 +338,7 @@ export default function ResetPasswordWithTokenScreen({
               {/* Back Link */}
               <TouchableOpacity onPress={onBack} disabled={isLoading}>
                 <Text style={{ fontSize: 13, color: '#8B5CF6', fontWeight: '600', textAlign: 'center' }}>
-                  Back to Email Reset
+                  {initialEmail ? 'Back' : 'Back to Email Reset'}
                 </Text>
               </TouchableOpacity>
             </View>

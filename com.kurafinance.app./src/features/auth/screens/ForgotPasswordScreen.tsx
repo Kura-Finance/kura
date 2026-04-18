@@ -14,28 +14,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../../../shared/store/useAppStore';
 import Logger from '../../../shared/utils/Logger';
-import ResetPasswordWithTokenScreen from './ResetPasswordWithTokenScreen';
 
 interface ForgotPasswordScreenProps {
   onNavigateToLogin?: () => void;
-  onSuccess?: () => void;
 }
 
 export default function ForgotPasswordScreen({
   onNavigateToLogin,
-  onSuccess,
 }: ForgotPasswordScreenProps) {
+  const [step, setStep] = useState<'email' | 'reset'>('email');
   const [email, setEmail] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [showResetPasswordWithToken, setShowResetPasswordWithToken] = useState(false);
 
   const requestPasswordReset = useAppStore((state) => state.requestPasswordReset);
+  const resetPassword = useAppStore((state) => state.resetPassword);
 
-  const handleRequestReset = async () => {
+  const handleSendCode = async () => {
     try {
-      // Validate form
       if (!email.trim()) {
         setError('Email is required');
         return;
@@ -49,145 +48,79 @@ export default function ForgotPasswordScreen({
       setIsLoading(true);
       setError(null);
 
-      Logger.debug('ForgotPasswordScreen', 'Requesting password reset', { email });
+      Logger.debug('ForgotPasswordScreen', 'Sending password reset code', { email });
       await requestPasswordReset(email);
 
-      setIsSubmitted(true);
-      
-      Alert.alert('Check Your Email', 'We sent a password reset link to your email address.');
+      Logger.info('ForgotPasswordScreen', 'Password reset code sent');
+      setStep('reset');
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to send reset email. Please try again.';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to send code';
       setError(errorMessage);
-      Logger.error('ForgotPasswordScreen', 'Password reset request failed', { error: errorMessage });
+      Logger.error('ForgotPasswordScreen', 'Send code failed', { error: errorMessage });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleResetPassword = async () => {
+    try {
+      if (!verificationCode.trim()) {
+        setError('Verification code is required');
+        return;
+      }
 
+      if (!newPassword.trim()) {
+        setError('New password is required');
+        return;
+      }
 
+      if (newPassword.length < 6) {
+        setError('Password must be at least 6 characters');
+        return;
+      }
 
-  if (showResetPasswordWithToken) {
-    return (
-      <ResetPasswordWithTokenScreen
-        onNavigateToLogin={onNavigateToLogin}
-        onBack={() => setShowResetPasswordWithToken(false)}
-      />
-    );
-  }
+      if (!confirmPassword.trim()) {
+        setError('Please confirm your password');
+        return;
+      }
 
-  if (isSubmitted) {
-    return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#0B0B0F' }}>
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, justifyContent: 'center' }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Success State */}
-          <View style={{ alignItems: 'center' }}>
-            <View
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: 40,
-                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: 24,
-              }}
-            >
-              <Ionicons name="checkmark-circle" size={40} color="#22C55E" />
-            </View>
+      if (newPassword !== confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
 
-            <Text style={{ fontSize: 20, fontWeight: '700', color: '#FFFFFF', marginBottom: 12 }}>
-              Check Your Email
-            </Text>
+      setIsLoading(true);
+      setError(null);
 
-            <Text
-              style={{
-                fontSize: 14,
-                color: '#CCCCCC',
-                textAlign: 'center',
-                marginBottom: 32,
-              }}
-            >
-              We sent a password reset link to{'\n'}
-              <Text style={{ fontWeight: '600', color: '#FFFFFF' }}>{email}</Text>
-            </Text>
+      Logger.debug('ForgotPasswordScreen', 'Resetting password', { email });
+      await resetPassword(email, verificationCode.trim(), newPassword);
 
-            <Text
-              style={{
-                fontSize: 12,
-                color: '#999999',
-                textAlign: 'center',
-                marginBottom: 32,
-              }}
-            >
-              Click the link in the email to reset your password. The link will expire in 24 hours.
-            </Text>
+      Logger.info('ForgotPasswordScreen', 'Password reset successfully');
+      Alert.alert('Success', 'Your password has been reset successfully. Please sign in.', [
+        {
+          text: 'OK',
+          onPress: onNavigateToLogin,
+        },
+      ]);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to reset password';
+      setError(errorMessage);
+      Logger.error('ForgotPasswordScreen', 'Reset password failed', { error: errorMessage });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            {/* Actions */}
-            <TouchableOpacity
-              onPress={onNavigateToLogin}
-              style={{
-                paddingVertical: 14,
-                borderRadius: 12,
-                backgroundColor: '#8B5CF6',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-                marginBottom: 12,
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>Back to Sign In</Text>
-            </TouchableOpacity>
+  const handleBack = () => {
+    if (step === 'reset') {
+      setStep('email');
+      setVerificationCode('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setError(null);
+    }
+  };
 
-            <TouchableOpacity
-              onPress={() => {
-                setIsSubmitted(false);
-                setEmail('');
-              }}
-              style={{
-                paddingVertical: 14,
-                borderRadius: 12,
-                backgroundColor: '#1A1A24',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-                borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.1)',
-                marginBottom: 12,
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#8B5CF6' }}>Try Another Email</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setShowResetPasswordWithToken(true)}
-              style={{
-                paddingVertical: 12,
-                paddingHorizontal: 16,
-                backgroundColor: 'rgba(139, 92, 246, 0.15)',
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: '#8B5CF6',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-              }}
-            >
-              <Ionicons name="key-outline" size={16} color="#8B5CF6" />
-              <Text style={{ fontSize: 14, color: '#8B5CF6', fontWeight: '600' }}>
-                Have a reset token? Reset directly
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0B0B0F' }}>
@@ -233,57 +166,199 @@ export default function ForgotPasswordScreen({
                 </View>
               )}
 
-              {/* Email Input */}
-              <View style={{ marginBottom: 20 }}>
-                <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
-                  Email Address
-                </Text>
-                <View
-                  style={{
-                    borderWidth: 1,
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: 12,
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
-                    backgroundColor: '#1A1A24',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Ionicons
-                    name="mail-outline"
-                    size={18}
-                    color="#9CA3AF"
-                    style={{ marginRight: 8 }}
-                  />
-                  <TextInput
-                    placeholder="your@email.com"
-                    placeholderTextColor="#666666"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    editable={!isLoading}
-                    autoCapitalize="none"
-                    style={{
-                      flex: 1,
-                      color: '#FFFFFF',
-                      fontSize: 14,
-                    }}
-                  />
-                </View>
-              </View>
+              {/* Step 1: Email Input */}
+              {step === 'email' ? (
+                <>
+                  {/* Email Input */}
+                  <View style={{ marginBottom: 16 }}>
+                    <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
+                      Email Address
+                    </Text>
+                    <View
+                      style={{
+                        borderWidth: 1,
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: 12,
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        backgroundColor: '#1A1A24',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons name="mail-outline" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+                      <TextInput
+                        placeholder="your@email.com"
+                        placeholderTextColor="#666666"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        textContentType="emailAddress"
+                        autoComplete="email"
+                        autoCapitalize="none"
+                        editable={!isLoading}
+                        style={{
+                          flex: 1,
+                          color: '#FFFFFF',
+                          fontSize: 14,
+                        }}
+                      />
+                    </View>
+                  </View>
 
-              {/* Description Text */}
-              <Text
-                style={{
-                  fontSize: 11,
-                  color: '#999999',
-                  textAlign: 'center',
-                  lineHeight: 16,
-                }}
-              >
-                Enter your email address and we&apos;ll send you a link to reset your password
-              </Text>
+                  {/* Description Text */}
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      color: '#999999',
+                      textAlign: 'center',
+                      lineHeight: 16,
+                    }}
+                  >
+                    Enter your email address and we&apos;ll send you a verification code
+                  </Text>
+                </>
+              ) : (
+                <>
+                  {/* Email Display (Read-only) */}
+                  <View style={{ marginBottom: 20 }}>
+                    <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
+                      Email
+                    </Text>
+                    <View
+                      style={{
+                        borderWidth: 1,
+                        borderColor: 'rgba(34, 197, 94, 0.3)',
+                        borderRadius: 12,
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        backgroundColor: 'rgba(34, 197, 94, 0.05)',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons name="checkmark-circle" size={18} color="#22C55E" style={{ marginRight: 8 }} />
+                      <Text style={{ flex: 1, color: '#FFFFFF', fontSize: 14 }}>{email}</Text>
+                    </View>
+                  </View>
+
+                  {/* Verification Code Input */}
+                  <View style={{ marginBottom: 20 }}>
+                    <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
+                      Verification Code
+                    </Text>
+                    <View
+                      style={{
+                        borderWidth: 1,
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: 12,
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        backgroundColor: '#1A1A24',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons name="key-outline" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+                      <TextInput
+                        placeholder="Enter verification code"
+                        placeholderTextColor="#666666"
+                        value={verificationCode}
+                        onChangeText={setVerificationCode}
+                        autoCapitalize="none"
+                        editable={!isLoading}
+                        style={{
+                          flex: 1,
+                          color: '#FFFFFF',
+                          fontSize: 14,
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                  {/* New Password Input */}
+                  <View style={{ marginBottom: 20 }}>
+                    <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
+                      New Password
+                    </Text>
+                    <View
+                      style={{
+                        borderWidth: 1,
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: 12,
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        backgroundColor: '#1A1A24',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+                      <TextInput
+                        placeholder="Enter new password"
+                        placeholderTextColor="#666666"
+                        value={newPassword}
+                        onChangeText={setNewPassword}
+                        secureTextEntry={true}
+                        autoCapitalize="none"
+                        editable={!isLoading}
+                        style={{
+                          flex: 1,
+                          color: '#FFFFFF',
+                          fontSize: 14,
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                  {/* Confirm Password Input */}
+                  <View style={{ marginBottom: 20 }}>
+                    <Text style={{ fontSize: 12, color: '#CCCCCC', fontWeight: '600', marginBottom: 8 }}>
+                      Confirm Password
+                    </Text>
+                    <View
+                      style={{
+                        borderWidth: 1,
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: 12,
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        backgroundColor: '#1A1A24',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Ionicons name="lock-closed-outline" size={18} color="#9CA3AF" style={{ marginRight: 8 }} />
+                      <TextInput
+                        placeholder="Confirm new password"
+                        placeholderTextColor="#666666"
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                        secureTextEntry={true}
+                        autoCapitalize="none"
+                        editable={!isLoading}
+                        style={{
+                          flex: 1,
+                          color: '#FFFFFF',
+                          fontSize: 14,
+                        }}
+                      />
+                    </View>
+                  </View>
+
+                  {/* Description Text */}
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      color: '#999999',
+                      textAlign: 'center',
+                      lineHeight: 16,
+                    }}
+                  >
+                    Enter your verification code and new password to reset your account
+                  </Text>
+                </>
+              )}
             </View>
 
             {/* ===== MIDDLE: Spacer (flex grows) ===== */}
@@ -291,9 +366,9 @@ export default function ForgotPasswordScreen({
 
             {/* ===== BOTTOM SECTION: Action Buttons ===== */}
             <View style={{ marginBottom: 24 }}>
-              {/* Submit Button */}
+              {/* Main Button */}
               <TouchableOpacity
-                onPress={handleRequestReset}
+                onPress={step === 'email' ? handleSendCode : handleResetPassword}
                 disabled={isLoading}
                 style={{
                   paddingVertical: 14,
@@ -309,15 +384,18 @@ export default function ForgotPasswordScreen({
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
                   <Text style={{ fontSize: 16, fontWeight: '600', color: '#FFFFFF' }}>
-                    Send Reset Link
+                    {step === 'email' ? 'Send Verification Code' : 'Reset Password'}
                   </Text>
                 )}
               </TouchableOpacity>
 
-              {/* Back Link */}
-              <TouchableOpacity onPress={onNavigateToLogin} disabled={isLoading}>
+              {/* Secondary Button */}
+              <TouchableOpacity
+                onPress={step === 'email' ? onNavigateToLogin : handleBack}
+                disabled={isLoading}
+              >
                 <Text style={{ fontSize: 13, color: '#8B5CF6', fontWeight: '600', textAlign: 'center' }}>
-                  Back to Sign In
+                  {step === 'email' ? 'Back to Sign In' : 'Edit Email'}
                 </Text>
               </TouchableOpacity>
             </View>
