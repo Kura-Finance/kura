@@ -41,6 +41,4 @@ coverage/
 jest.config.js
 
 # Other
-.firebase
-firebase-debug.log
 certificates/

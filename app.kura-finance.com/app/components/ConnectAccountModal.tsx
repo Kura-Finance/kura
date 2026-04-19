@@ -22,7 +22,7 @@ interface ConnectAccountModalProps {
 
 export default function ConnectAccountModal({ isOpen, onClose }: ConnectAccountModalProps) {
   const [mounted, setMounted] = useState(false);
-  const [isConnecting, setIsConnecting] = useState<'plaid' | 'walletconnect' | null>(null);
+  const [isConnecting, setIsConnecting] = useState<'plaid' | 'reown' | null>(null);
   const [plaidError, setPlaidError] = useState<string | null>(null);
   const [isExchangingToken, setIsExchangingToken] = useState(false);
 
@@ -120,19 +120,19 @@ export default function ConnectAccountModal({ isOpen, onClose }: ConnectAccountM
     setIsConnecting(null);
   };
 
-  const handleWalletConnect = async () => {
-    setIsConnecting('walletconnect');
+  const handleReownConnect = async () => {
+    setIsConnecting('reown');
     setPlaidError(null);
 
     try {
-      const walletConnectConnector = connectors.find(
+      const reownConnector = connectors.find(
         (connector) =>
           connector.id.toLowerCase().includes('walletconnect') ||
           connector.type.toLowerCase().includes('walletconnect')
       );
 
-      if (walletConnectConnector) {
-        await connectAsync({ connector: walletConnectConnector });
+      if (reownConnector) {
+        await connectAsync({ connector: reownConnector });
         onClose();
         return;
       }
@@ -258,10 +258,10 @@ export default function ConnectAccountModal({ isOpen, onClose }: ConnectAccountM
                   </button>
 
                   <button
-                    onClick={handleWalletConnect}
+                    onClick={handleReownConnect}
                     disabled={isConnecting !== null || isExchangingToken}
                     className={`w-full p-4 rounded-2xl border transition-all duration-300 flex items-center gap-4 group text-left ${
-                      isConnecting === 'walletconnect'
+                      isConnecting === 'reown'
                         ? 'border-[#3B82F6] bg-[#3B82F6]/10'
                         : 'border-white/5 bg-[#1A1A24] hover:border-[#3B82F6]/50 hover:bg-white/5'
                     }`}
@@ -273,9 +273,9 @@ export default function ConnectAccountModal({ isOpen, onClose }: ConnectAccountM
                     </div>
                     <div className="flex-1">
                       <div className="text-white font-bold text-base mb-0.5 group-hover:text-[#3B82F6] transition-colors">Web3 Wallet</div>
-                      <div className="text-xs text-gray-500 line-clamp-2">Connect Metamask, Phantom, Trust Wallet, and 100+ decentralized wallets via WalletConnect.</div>
+                      <div className="text-xs text-gray-500 line-clamp-2">Connect Metamask, Phantom, Trust Wallet, and 100+ decentralized wallets via Reown.</div>
                     </div>
-                    {isConnecting === 'walletconnect' ? (
+                    {isConnecting === 'reown' ? (
                       <div className="w-5 h-5 border-2 border-[#3B82F6] border-t-transparent rounded-full animate-spin shrink-0" />
                     ) : (
                       <div className="text-gray-600 group-hover:text-[#3B82F6] transition-colors shrink-0">→</div>

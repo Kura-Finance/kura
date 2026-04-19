@@ -11,10 +11,6 @@ README.md
 out
 dist
 build
-coverage
-.firebase
-firebase-debug.log
-certificates
 .vscode
 .idea
 *.swp

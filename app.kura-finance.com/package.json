@@ -12,17 +12,14 @@
     "start": "next start",
     "start:standalone": "node .next/standalone/server.js",
     "deploy": "bash ./scripts/deploy.sh",
-    "deploy:preview": "npm run build && firebase hosting:channel:deploy preview --project kura-b39eb",
-    "deploy:static": "npm run build:static && firebase deploy --only hosting --project kura-b39eb",
     "deploy:cloud-run": "npm run build:standalone && gcloud run deploy kura-web --source . --project kura-b39eb --region us-central1 --allow-unauthenticated",
     "lint": "eslint"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.96.2",
     "@types/jsonwebtoken": "^9.0.10",
-    "@walletconnect/ethereum-provider": "^2.23.9",
+    "@reown/appkit": "^1.4.0",
     "@web3modal/wagmi": "^5.1.11",
-    "firebase": "^12.11.0",
     "framer-motion": "^12.38.0",
     "jsonwebtoken": "^9.0.3",
     "next": "16.2.2",
