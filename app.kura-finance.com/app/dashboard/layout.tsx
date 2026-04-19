@@ -1,4 +1,8 @@
+"use client";
+
 import React from 'react';
+import { useAppStore } from '@/store/useAppStore';
+import { useRouter } from 'next/navigation';
 import Sidebar from './_components/Sidebar';
 
 export default function DashboardLayout({
@@ -6,6 +10,35 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const authStatus = useAppStore((state) => state.authStatus);
+  const router = useRouter();
+
+  // Redirect to home if not authenticated
+  React.useEffect(() => {
+    if (authStatus === 'unauthenticated') {
+      router.push('/');
+    }
+  }, [authStatus, router]);
+
+  // Show loading state while checking auth
+  if (authStatus === 'loading') {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#8B5CF6]/20 mb-4">
+            <div className="w-8 h-8 border-2 border-[#8B5CF6] border-t-transparent rounded-full animate-spin" />
+          </div>
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only render dashboard if authenticated
+  if (authStatus !== 'authenticated') {
+    return null;
+  }
+
   return (
     <div className="flex flex-1 overflow-hidden">
       {/* 只有進入 Dashboard 才會顯示左側導航 */}

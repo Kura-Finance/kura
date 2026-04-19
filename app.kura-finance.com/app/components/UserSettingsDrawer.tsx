@@ -17,9 +17,6 @@ import PreferencesView from './settings/PreferencesView';
 const ConnectAccountModal = dynamic(() => import('./ConnectAccountModal'), {
   ssr: false,
 });
-const AuthModal = dynamic(() => import('./AuthModal'), {
-  ssr: false,
-});
 
 interface UserSettingsDrawerProps {
   isOpen: boolean;
@@ -40,16 +37,9 @@ export default function UserSettingsDrawer({ isOpen, onClose }: UserSettingsDraw
   const pathname = usePathname() || '';
   const [activeView, setActiveView] = useState<ViewState>('main');
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const authStatus = useAppStore((state) => state.authStatus);
 
   const openConnectFlow = () => {
-    if (authStatus === 'authenticated') {
-      setIsConnectModalOpen(true);
-      return;
-    }
-
-    setIsAuthModalOpen(true);
+    setIsConnectModalOpen(true);
   };
 
   useEffect(() => {
@@ -134,13 +124,7 @@ export default function UserSettingsDrawer({ isOpen, onClose }: UserSettingsDraw
               onClose={() => setIsConnectModalOpen(false)}
             />
           )}
-          {isAuthModalOpen && (
-            <AuthModal
-              isOpen={isAuthModalOpen}
-              onClose={() => setIsAuthModalOpen(false)}
-              onAuthenticated={() => setIsConnectModalOpen(true)}
-            />
-          )}
+
         </motion.div>
       )}
     </AnimatePresence>,

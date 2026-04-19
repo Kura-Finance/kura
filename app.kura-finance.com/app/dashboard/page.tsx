@@ -13,9 +13,6 @@ import { updatePlaidAccountOrder } from '@/lib/plaidApi';
 const ConnectAccountModal = dynamic(() => import('@/components/ConnectAccountModal'), {
   ssr: false,
 });
-const AuthModal = dynamic(() => import('@/components/AuthModal'), {
-  ssr: false,
-});
 
 export default function DashboardPage() {
   const accounts = useFinanceStore(state => state.accounts);
@@ -32,17 +29,11 @@ export default function DashboardPage() {
   const [selectedAccountId, setSelectedAccountId] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState<boolean>(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
   const [inputText, setInputText] = useState('');
 
   const openConnectFlow = () => {
-    if (authStatus === 'authenticated') {
-      setIsConnectModalOpen(true);
-      return;
-    }
-
-    setIsAuthModalOpen(true);
+    setIsConnectModalOpen(true);
   };
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -110,13 +101,7 @@ export default function DashboardPage() {
           onClose={() => setIsConnectModalOpen(false)}
         />
       )}
-      {isAuthModalOpen && (
-        <AuthModal
-          isOpen={isAuthModalOpen}
-          onClose={() => setIsAuthModalOpen(false)}
-          onAuthenticated={() => setIsConnectModalOpen(true)}
-        />
-      )}
+
 
       <div className="mb-4">
         <h1 className="text-3xl font-bold text-white">Dashboard</h1>

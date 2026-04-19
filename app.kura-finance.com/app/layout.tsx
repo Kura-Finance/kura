@@ -77,7 +77,7 @@ export default function RootLayout({
           <TopNav />
           
           {/* 把空間完全交給 children (也就是 dashboard 的 layout) */}
-          <div className="flex flex-1 overflow-hidden min-h-[calc(100vh-4rem)]">
+          <div className="flex flex-1 overflow-hidden">
             {children}
           </div>
         </Web3ModalProvider>

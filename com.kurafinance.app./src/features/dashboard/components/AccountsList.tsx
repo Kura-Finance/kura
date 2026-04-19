@@ -127,7 +127,7 @@ export default function AccountsList({
                 style={{
                   borderRadius: 16,
                   marginTop,
-                  zIndex: isSelected ? 1000 : index + 1,
+                  zIndex: index + 1,
                   overflow: 'hidden',
                   borderWidth: 2,
                   borderColor: '#1A1A24',

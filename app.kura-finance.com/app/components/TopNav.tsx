@@ -10,8 +10,14 @@ import { useAppStore } from '@/store/useAppStore';
 export default function TopNav() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const userProfile = useAppStore(state => state.userProfile);
+  const authStatus = useAppStore(state => state.authStatus);
   const displayName = userProfile.displayName.trim();
   const avatarInitial = displayName ? displayName.slice(0, 1).toUpperCase() : '?';
+
+  // Only show header when authenticated
+  if (authStatus !== 'authenticated') {
+    return null;
+  }
 
   return (
     <>

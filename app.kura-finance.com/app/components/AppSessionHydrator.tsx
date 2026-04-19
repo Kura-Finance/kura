@@ -7,10 +7,18 @@ import { useFinanceStore } from '@/store/useFinanceStore';
 export default function AppSessionHydrator() {
   const authToken = useAppStore((state) => state.authToken);
   const authStatus = useAppStore((state) => state.authStatus);
+  const hydrateFromStorage = useAppStore((state) => state.hydrateFromStorage);
   const hydrateUserProfile = useAppStore((state) => state.hydrateUserProfile);
   const clearAuthSession = useAppStore((state) => state.clearAuthSession);
   const hydratePlaidFinanceData = useFinanceStore((state) => state.hydratePlaidFinanceData);
   const clearPlaidFinanceData = useFinanceStore((state) => state.clearPlaidFinanceData);
+
+  // Initialize auth state from storage on first load
+  useEffect(() => {
+    if (authStatus === 'loading' && !authToken) {
+      void hydrateFromStorage();
+    }
+  }, []);
 
   useEffect(() => {
     if (authStatus !== 'loading') {

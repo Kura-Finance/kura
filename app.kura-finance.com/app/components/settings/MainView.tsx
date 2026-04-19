@@ -55,21 +55,6 @@ export default function MainView({ pathname, handleClose, setActiveView, onConne
         </div>
       )}
 
-      <div className="mb-8">
-        <div className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-3">App Switcher</div>
-        <div className="flex items-center gap-1.5 bg-[#1A1A24] p-1.5 rounded-2xl border border-white/5">
-          <Link href="/dashboard" onClick={handleClose} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-xl transition-all ${pathname.includes('/dashboard') ? 'bg-[#8B5CF6] shadow-[0_4px_15px_rgba(139,92,246,0.3)] text-white' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}>
-            <span className="text-xl mb-1.5">📊</span><span className="text-[10px] font-bold tracking-wider uppercase">Dashboard</span>
-          </Link>
-          <Link href="/reward" onClick={handleClose} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-xl transition-all ${pathname.includes('/reward') ? 'bg-[#8B5CF6] shadow-[0_4px_15px_rgba(139,92,246,0.3)] text-white' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}>
-            <span className="text-xl mb-1.5">🎁</span><span className="text-[10px] font-bold tracking-wider uppercase">Rewards</span>
-          </Link>
-          <Link href="/forum" onClick={handleClose} className={`flex-1 flex flex-col items-center justify-center py-3 rounded-xl transition-all ${pathname.includes('/forum') ? 'bg-[#8B5CF6] shadow-[0_4px_15px_rgba(139,92,246,0.3)] text-white' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}`}>
-            <span className="text-xl mb-1.5">💬</span><span className="text-[10px] font-bold tracking-wider uppercase">Forum</span>
-          </Link>
-        </div>
-      </div>
-
       <div>
         <div className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-3">Settings</div>
         <div className="flex flex-col gap-1">
