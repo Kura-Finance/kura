@@ -14,7 +14,7 @@ export default function Sidebar() {
   const isBudget = pathname.includes('/dashboard/budget');
 
   return (
-    <nav className="relative z-10 group w-20 hover:w-56 border-r border-[#1A1A24] bg-[#0B0B0F] py-6 px-3 flex flex-col gap-2 shrink-0 transition-all duration-300 ease-in-out overflow-hidden h-full">
+    <nav className="relative z-10 w-56 border-r border-[#1A1A24] bg-[#0B0B0F] py-6 px-3 flex flex-col gap-2 shrink-0 transition-all duration-300 ease-in-out overflow-hidden h-full">
       
       {/* 1. Banking (首頁) */}
       <Link 
@@ -28,7 +28,7 @@ export default function Sidebar() {
         <div className="w-8 flex justify-center items-center shrink-0">
           <span className="text-xl">🏦</span>
         </div>
-        <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-100 transition-opacity duration-300">
           Banking
         </span>
       </Link>
@@ -45,7 +45,7 @@ export default function Sidebar() {
         <div className="w-8 flex justify-center items-center shrink-0">
           <span className="text-xl">📈</span>
         </div>
-        <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-100 transition-opacity duration-300">
           Investment
         </span>
       </Link>
@@ -62,7 +62,7 @@ export default function Sidebar() {
         <div className="w-8 flex justify-center items-center shrink-0">
           <span className="text-xl">👛</span>
         </div>
-        <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-100 transition-opacity duration-300">
           Budget
         </span>
       </Link>
