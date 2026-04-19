@@ -3,6 +3,7 @@
 import React from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { useRouter } from 'next/navigation';
+import TopNav from '@/components/TopNav';
 import Sidebar from './_components/Sidebar';
 
 export default function DashboardLayout({
@@ -40,14 +41,23 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex flex-1 overflow-hidden">
-      {/* 只有進入 Dashboard 才會顯示左側導航 */}
-      <Sidebar />
+    <div className="flex flex-col h-screen">
+      {/* TopNav - Fixed at top */}
+      <TopNav />
       
-      {/* 這裡的 children 會渲染 dashboard/page.tsx 的內容 */}
-      <main className="relative z-30 flex-1 overflow-y-auto p-10 bg-gradient-to-br from-[#0B0B0F] to-[#1A1A24]/30">
-        {children}
-      </main>
+      {/* Main content area with Sidebar */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - Fixed, non-scrollable */}
+        <Sidebar />
+        
+        {/* Main content - Scrollable */}
+        <main className="relative z-30 flex-1 overflow-y-auto p-10 bg-gradient-to-br from-[#0B0B0F] to-[#1A1A24]/30">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
     </div>
   );
 }

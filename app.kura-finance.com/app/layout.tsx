@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
-import TopNav from "./components/TopNav";
 import Web3ModalProvider from '@/context/Web3ModalProvider';
 
 export const metadata: Metadata = {
@@ -73,9 +72,6 @@ export default function RootLayout({
         
         {/* 💡 用 Provider 包住整個應用程式，確保 Navbar 也能讀取錢包狀態 */}
         <Web3ModalProvider>
-          {/* 全域頂部導航 */}
-          <TopNav />
-          
           {/* 把空間完全交給 children (也就是 dashboard 的 layout) */}
           <div className="flex flex-1 overflow-hidden">
             {children}

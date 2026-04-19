@@ -41,7 +41,7 @@ export default function Sidebar() {
   const isCreditScore = pathname.includes('/dashboard/credit-score');
 
   return (
-    <nav className="relative z-10 w-56 border-r border-[#1A1A24] bg-[#0B0B0F] py-6 px-2 flex flex-col gap-0 shrink-0 transition-all duration-300 ease-in-out overflow-y-auto h-full">
+    <nav className="relative z-10 w-56 border-r border-[#1A1A24] bg-[#0B0B0F] py-6 px-2 flex flex-col gap-0 shrink-0 transition-all duration-300 ease-in-out h-full overflow-hidden">
       
       {/* Home */}
       <NavLink href="/dashboard" label="Home" isActive={isHome} />
