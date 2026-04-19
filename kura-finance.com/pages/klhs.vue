@@ -17,17 +17,14 @@ useSeoMeta({
 
 const whyKLHS = [
   {
-    icon: '🔍',
     title: 'Cross-Fi Utilization Check',
     description: 'Pure on-chain protocols can only see crypto assets. Kura integrates compliant APIs to access traditional fiat account balances (US top-tier banks). Real poverty with billions in chain assets becomes instantly detectable. Calculate true financial health with unparalleled precision.'
   },
   {
-    icon: '📜',
     title: 'The 2-Year Liquidation Memory',
     description: 'Stop counting meaningless transfer counts. KLHS deeply tracks borrowing history and liquidation records across major lending protocols (Aave, Morpho). Addresses with excellent repayment history are the quality liquidity your protocol deserves.'
   },
   {
-    icon: '🆔',
     title: 'DID-Backed Scoring',
     description: 'KLHS assigns maximum weight to addresses bound to Kura DID (KDID), Worldcoin, or Palau RNS.id. Dramatically increase the default cost for malicious actors. Eliminate the arbitrage space for throwaway sybil wallets.'
   }
@@ -46,7 +43,6 @@ const privacyPoints = [
 
 const layers = [
   {
-    icon: '🆔',
     title: 'Identity Layer',
     subtitle: 'The Absolute Defense with DID',
     description: 'Identity verification is the cornerstone of KLHS, determining the credit foundation for every user.',
@@ -62,7 +58,6 @@ const layers = [
     ]
   },
   {
-    icon: '📊',
     title: 'Scoring Dimensions',
     subtitle: 'Dimensional Reduction Attack of TradFi Logic',
     description: 'Built on the essence of modern financial risk control, designed dimensions include:',
@@ -82,7 +77,6 @@ const layers = [
     ]
   },
   {
-    icon: '⚙️',
     title: 'Technical Delivery',
     subtitle: 'ZK + Oracle Architecture',
     description: 'An elegant technical architecture that balances privacy and decentralized trust.',
@@ -142,7 +136,7 @@ const layers = [
       <div class="max-w-5xl mx-auto">
         <div class="mb-16">
           <h2 class="text-4xl md:text-5xl font-bold mb-6">
-            🛑 Why Over-Collateralization Isn't Enough
+            Why Over-Collateralization Isn't Enough
           </h2>
           <p class="text-lg text-kura-text-secondary leading-relaxed mb-8">
             DeFi has always relied on "over-collateralization" as the sole safety net. But recent cross-chain bridge exploits and malicious asset minting have proven one thing: when protocols can only read "collateral balance," the system is dangerously fragile.
@@ -150,7 +144,7 @@ const layers = [
           
           <div class="grid md:grid-cols-2 gap-8 mb-8">
             <div class="p-6 md:p-8 rounded-xl bg-kura-background-light border-2 border-kura-success/20">
-              <div class="text-2xl mb-4">✅</div>
+              <div class="text-2xl mb-4"></div>
               <h3 class="text-xl font-bold mb-3">What Protocols Can't See</h3>
               <p class="text-kura-text-secondary">
                 A whale with 3 years of excellent Aave repayment history, bound to real identity
@@ -158,7 +152,7 @@ const layers = [
             </div>
 
             <div class="p-6 md:p-8 rounded-xl bg-kura-background-light border-2 border-kura-error/20">
-              <div class="text-2xl mb-4">⚠️</div>
+              <div class="text-2xl mb-4"></div>
               <h3 class="text-xl font-bold mb-3">The Threat They Miss</h3>
               <p class="text-kura-text-secondary">
                 A sybil wallet created 5 minutes ago, exploiting a vulnerability to drain the WETH pool
@@ -180,7 +174,7 @@ const layers = [
       <div class="max-w-6xl mx-auto">
         <div class="text-center mb-16">
           <h2 class="text-4xl md:text-5xl font-bold mb-6">
-            🛡️ Why Choose Kura KLHS as Your Risk Defense Line?
+            Why Choose Kura KLHS as Your Risk Defense Line?
           </h2>
           <p class="text-lg text-kura-text-secondary max-w-3xl mx-auto">
             Kura doesn't build a single-dimension on-chain score. We introduce Web3's first "Hybrid Finance Credit Oracle"—exclusive defensive data for DeFi protocols.
@@ -190,7 +184,6 @@ const layers = [
         <div class="grid md:grid-cols-3 gap-8">
           <div v-for="(item, index) in whyKLHS" :key="index" 
                class="p-8 rounded-xl bg-kura-background-light border border-kura-border hover:border-kura-primary/50 transition-all duration-300">
-            <div class="text-5xl mb-6">{{ item.icon }}</div>
             <h3 class="text-2xl font-bold mb-4">{{ item.title }}</h3>
             <p class="text-kura-text-secondary leading-relaxed">
               {{ item.description }}
@@ -205,7 +198,7 @@ const layers = [
       <div class="max-w-5xl mx-auto">
         <div class="text-center mb-16">
           <h2 class="text-4xl md:text-5xl font-bold mb-6">
-            🤫 Privacy and Credit: A Perfect Balance
+            Privacy and Credit: A Perfect Balance
           </h2>
           <p class="text-lg text-kura-text-secondary mb-8">
             Building credit doesn't mean surrendering privacy. We understand Web3 users' absolute bottom line on data protection.
@@ -239,7 +232,6 @@ const layers = [
         <div v-for="(layer, index) in layers" :key="index" class="mb-20 md:mb-32 last:mb-0">
           <!-- Layer Header -->
           <div class="flex items-start gap-4 mb-12">
-            <div class="text-5xl flex-shrink-0">{{ layer.icon }}</div>
             <div class="flex-1">
               <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">
                 {{ layer.subtitle }}
@@ -277,7 +269,7 @@ const layers = [
       <div class="max-w-4xl mx-auto">
         <div class="text-center space-y-8 p-8 md:p-12 rounded-2xl bg-gradient-to-r from-kura-primary/10 to-kura-secondary/10 border border-kura-primary/20">
           <h2 class="text-4xl md:text-5xl font-bold">
-            🚀 Integrate Kura API
+            Integrate Kura API
           </h2>
           <p class="text-lg md:text-xl text-kura-text-secondary leading-relaxed">
             Redefine your protocol's capital efficiency. Stop letting bad coins drive out good ones. Integrate Kura Liquidity Health Score into your smart contracts and offer better borrowing rates to loyal users while minimizing protocol bad debt.

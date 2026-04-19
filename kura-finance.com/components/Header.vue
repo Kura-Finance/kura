@@ -82,10 +82,10 @@
                 <div class="text-base font-semibold text-kura-text group-hover/item:text-kura-primary transition-colors">KLHS</div>
                 <div class="text-sm text-kura-text-secondary line-clamp-2">Kura Liquidity Health Score for creditworthiness.</div>
               </NuxtLink>
-              <a href="#notary" class="group/item flex flex-col gap-2 p-4 rounded-xl hover:bg-kura-background-light transition-colors border border-transparent hover:border-kura-border" @click="activeDropdown = null">
-                <div class="text-base font-semibold text-kura-text group-hover/item:text-kura-primary transition-colors">Kura Notary (Coming Soon)</div>
-                <div class="text-sm text-kura-text-secondary line-clamp-2">On-chain digital verification and security mechanism.</div>
-              </a>
+              <NuxtLink to="/notary" class="group/item flex flex-col gap-2 p-4 rounded-xl hover:bg-kura-background-light transition-colors border border-transparent hover:border-kura-border" @click="activeDropdown = null">
+                <div class="text-base font-semibold text-kura-text group-hover/item:text-kura-primary transition-colors">Kura Notary</div>
+                <div class="text-sm text-kura-text-secondary line-clamp-2">Decentralized blockchain notarization platform.</div>
+              </NuxtLink>
             </div>
 
             <!-- Solutions Menu -->
@@ -166,9 +166,9 @@
                   <NuxtLink to="/klhs" @click="isMobileMenuOpen = false; activeMobileSubmenu = null" class="block py-2 text-sm text-kura-text-secondary hover:text-kura-primary transition-colors">
                     KLHS
                   </NuxtLink>
-                  <a href="#notary" @click="isMobileMenuOpen = false; activeMobileSubmenu = null" class="block py-2 text-sm text-kura-text-secondary hover:text-kura-primary transition-colors">
-                    Kura Notary (Coming Soon)
-                  </a>
+                  <NuxtLink to="/notary" @click="isMobileMenuOpen = false; activeMobileSubmenu = null" class="block py-2 text-sm text-kura-text-secondary hover:text-kura-primary transition-colors">
+                    Kura Notary
+                  </NuxtLink>
                 </div>
               </transition>
             </div>

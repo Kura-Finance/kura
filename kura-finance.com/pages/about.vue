@@ -17,9 +17,9 @@
       <div class="content-with-image">
         <div class="image-placeholder"></div>
         <div class="content-block">
-          <h2 class="mission-title">Our Mission: Bridging the Gap Between Web3 and Traditional Finance</h2>
+          <h2 class="mission-title">Our Mission: Redefining Trust in a Decentralized World</h2>
           <p class="mission-text">
-            At Kura Finance, we believe that managing your assets across decentralized protocols and traditional bank accounts shouldn't require a dozen open tabs and complex spreadsheets. Our mission is to build the most intuitive, unified financial dashboard for the modern digital citizen.
+            At Kura Finance, we believe that managing assets across TradFi and Web3 shouldn't be fragmented, and decentralized lending shouldn't rely solely on over-collateralization. Our mission is to build a unified ecosystem: an intuitive financial dashboard for the modern digital citizen, powered by a decentralized credit infrastructure that brings capital efficiency to Web3.
           </p>
         </div>
       </div>
@@ -43,9 +43,9 @@
       <div class="content-with-image">
         <div class="image-placeholder"></div>
         <div class="content-block">
-          <h2 class="innovation-title">Forward-Looking Innovation</h2>
+          <h2 class="innovation-title">The Kura Liquidity Health Score (KLHS)</h2>
           <p class="innovation-text">
-            Beyond data aggregation, we are constantly exploring how blockchain technology can solve traditional pain points. With our upcoming blockchain notary features, we aim to leverage the immutability of decentralized networks to provide secure, verifiable proof of existence for critical legal and business documents.
+            Beyond data aggregation, we are solving DeFi's biggest risk management flaw. We are pioneering KLHS—a Zero-Knowledge (ZK) powered credit oracle. By securely bridging traditional bank account utilization with on-chain lending history and DID verification, we empower protocols to offer undercollateralized loans to premium users while completely shielding user privacy.
           </p>
         </div>
       </div>
@@ -142,35 +142,41 @@
 import { reactive } from 'vue'
 
 useSeoMeta({
-  title: 'About Kura Finance',
-  description: 'Meet the team behind Kura Finance. We are building practical financial infrastructure for Web3 developers, digital nomads, and enterprises managing cross-border assets.',
-  keywords: 'Kura Finance team, founder Rick Weng, Web3 finance company, fintech startup, wealth management platform',
-  ogTitle: 'About Kura Finance',
-  ogDescription: 'Meet the team behind Kura Finance. We are building practical financial infrastructure for Web3 developers, digital nomads, and enterprises managing cross-border assets.',
+  title: 'About Kura Finance | The Web3 Credit Oracle & Dashboard',
+  description: 'Building the ultimate hybrid finance infrastructure. Kura Finance combines a powerful cross-chain dashboard with KLHS, the first Zero-Knowledge credit oracle for DeFi.',
+  keywords: 'Web3 credit score, DeFi oracle, Kura Finance, KLHS, ZK proof identity, cross-border dashboard, Rick Weng',
+  ogTitle: 'About Kura Finance | Hybrid Finance Infrastructure',
+  ogDescription: 'From unified fiat-crypto dashboards to institutional-grade DeFi risk management. Discover the ecosystem behind Kura.',
   ogUrl: 'https://kura-finance.com/about',
   ogType: 'website',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'About Kura Finance'
+  twitterTitle: 'About Kura Finance | The Web3 Credit Oracle'
 });
 
 const milestones = reactive([
   {
-    time: 'Phase 1: The Catalyst',
-    title: 'A Fragmented Financial Truth',
-    content: 'Facing financial data scattered across banks and multiple Web3 wallets, we decided to build a clean interface focused on practical integration, rejecting complexity and redundancy.',
+    time: 'Phase 1: The Dashboard',
+    title: 'Bridging Fiat & On-Chain Data',
+    content: 'We launched the Kura Dashboard to solve our own pain points—creating a unified interface capable of securely reading on-chain assets while tracking traditional bank accounts.',
     type: 'info'
   },
   {
-    time: 'Phase 2: Building the Foundation',
-    title: 'Bridging Fiat & On-Chain Data',
-    content: 'Through integrating cutting-edge technology, we created a unified dashboard capable of securely reading on-chain assets while connecting traditional financial data.',
+    time: 'Phase 2: Digital Identity',
+    title: 'KDID & Institutional Verification',
+    content: 'Implementing robust KYC and integration with top-tier Web3 DID protocols (Palau RNS.id, Worldcoin) to establish a baseline of Sybil-resistant identities.',
     type: 'success'
   },
   {
-    time: 'Phase 3: The Horizon',
-    title: 'Immutable Proof of Existence',
-    content: 'In the future, we will launch a decentralized blockchain-based notary platform providing immutable timestamps and digital fingerprints for critical legal documents.',
+    time: 'Phase 3: Legal Immutability',
+    title: 'Kura Blockchain Notary',
+    content: 'Deploying a decentralized notary platform that provides immutable timestamps and cryptographic proof of existence for cross-border enterprise contracts.',
     type: 'warning'
+  },
+  {
+    time: 'Phase 4: The Ultimate Infrastructure',
+    title: 'KLHS Credit Oracle',
+    content: 'Rolling out our Zero-Knowledge credit oracle for DeFi protocols, fundamentally upgrading Web3 lending from over-collateralized silos to reputation-based capital efficiency.',
+    type: 'error'
   }
 ])
 </script>
