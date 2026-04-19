@@ -68,12 +68,12 @@ export default function ConnectAccountModal({ isOpen, onClose }: ConnectAccountM
       setPlaidError(null);
 
       try {
-        const result = await exchangePlaidPublicToken(authToken, {
+        const result = await exchangePlaidPublicToken({
           public_token: publicToken,
           institution_name: metadata.institution?.name,
         });
 
-        await hydratePlaidFinanceData(authToken);
+        await hydratePlaidFinanceData();
         alert(result.message || 'Bank account connected successfully.');
         onClose();
       } catch (error) {
@@ -105,7 +105,7 @@ export default function ConnectAccountModal({ isOpen, onClose }: ConnectAccountM
     setIsConnecting('plaid');
 
     if (!linkToken) {
-      await fetchPlaidLinkToken(authToken);
+      await fetchPlaidLinkToken();
       setIsConnecting(null);
       return;
     }
