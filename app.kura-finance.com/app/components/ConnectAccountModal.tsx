@@ -38,10 +38,10 @@ export default function ConnectAccountModal({ isOpen, onClose }: ConnectAccountM
   }, []);
 
   const fetchPlaidLinkToken = useCallback(
-    async (token: string) => {
+    async () => {
       try {
         setPlaidError(null);
-        const result = await createPlaidLinkToken(token);
+        const result = await createPlaidLinkToken();
         setPlaidLinkToken(result.link_token);
       } catch (error) {
         const message =
@@ -53,9 +53,9 @@ export default function ConnectAccountModal({ isOpen, onClose }: ConnectAccountM
   );
 
   useEffect(() => {
-    if (!isOpen || !authToken || linkToken) return;
-    void fetchPlaidLinkToken(authToken);
-  }, [authToken, fetchPlaidLinkToken, isOpen, linkToken]);
+    if (!isOpen || linkToken) return;
+    void fetchPlaidLinkToken();
+  }, [fetchPlaidLinkToken, isOpen, linkToken]);
 
   const onPlaidSuccess = useCallback(
     async (publicToken: string, metadata: PlaidLinkOnSuccessMetadata) => {
