@@ -129,8 +129,11 @@ export default function DashboardPage() {
                     )}
                   </div>
                   {/* Account Name and Balance */}
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 flex items-center gap-2">
                     <p className="text-white font-medium text-sm truncate">{account.name}</p>
+                    <span className="px-2 py-0.5 rounded bg-white/10 text-gray-400 text-xs font-medium flex-shrink-0 capitalize">
+                      {account.type}
+                    </span>
                   </div>
                   <p className={`font-mono font-medium text-sm flex-shrink-0 ${account.type === 'credit' ? 'text-red-400' : 'text-green-400'}`}>
                     ${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
