@@ -108,7 +108,7 @@ export default function UserSettingsDrawer({ isOpen, onClose, anchorRef }: UserS
             <div className="px-6 py-4 flex flex-col gap-2">
               {/* Profile */}
               <button
-                onClick={() => handleMenuClick(() => router.push('/dashboard'))}
+                onClick={() => handleMenuClick(() => router.push('/dashboard/profile'))}
                 className="w-full text-left px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors text-sm"
               >
                 Profile
@@ -132,10 +132,13 @@ export default function UserSettingsDrawer({ isOpen, onClose, anchorRef }: UserS
 
               {/* Privacy */}
               <a
-                href="#"
-                className="w-full text-left px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors text-sm block"
+                href="https://kura-finance.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-left px-3 py-2.5 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors text-sm block flex items-center justify-between"
               >
-                Privacy
+                <span>Privacy</span>
+                <span className="text-gray-500 group-hover:text-gray-300">↗</span>
               </a>
             </div>
 
