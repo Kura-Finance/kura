@@ -3,6 +3,7 @@
 
 import React, { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { useFinanceStore } from '../store/useFinanceStore';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -105,12 +106,24 @@ export default function DashboardPage() {
             <p className="text-gray-400 text-sm font-medium mb-2">Accounts</p>
             <div className="space-y-1">
               {accounts.map((account) => (
-                <div key={account.id} className="flex justify-between items-center py-1 border-b border-white/5 last:border-0">
-                  <div>
-                    <p className="text-white font-medium text-sm">{account.name}</p>
-                    <p className="text-gray-500 text-sm">{account.type}</p>
+                <div key={account.id} className="flex justify-between items-center py-1 border-b border-white/5 last:border-0 gap-2">
+                  {/* Account Logo */}
+                  {account.logo && (
+                    <div className="w-8 h-8 flex-shrink-0 rounded-full bg-white/5 flex items-center justify-center overflow-hidden">
+                      <Image
+                        src={account.logo}
+                        alt={account.name}
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  {/* Account Name and Balance */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white font-medium text-sm truncate">{account.name}</p>
                   </div>
-                  <p className={`font-mono font-medium text-sm ${account.type === 'credit' ? 'text-red-400' : 'text-green-400'}`}>
+                  <p className={`font-mono font-medium text-sm flex-shrink-0 ${account.type === 'credit' ? 'text-red-400' : 'text-green-400'}`}>
                     ${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
