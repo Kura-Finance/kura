@@ -108,7 +108,7 @@ export default function DashboardPage() {
               {accounts.map((account) => (
                 <div key={account.id} className="flex justify-between items-center py-1 border-b border-white/5 last:border-0 gap-2">
                   {/* Account Logo or Initial */}
-                  <div className="w-8 h-8 flex-shrink-0 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#6D28D9] flex items-center justify-center overflow-hidden">
+                  <div className="w-8 h-8 flex-shrink-0 rounded-full bg-white flex items-center justify-center overflow-hidden">
                     {account.logo ? (
                       <Image
                         src={account.logo}
@@ -123,7 +123,7 @@ export default function DashboardPage() {
                       />
                     ) : null}
                     {!account.logo && (
-                      <span className="text-white text-xs font-bold">
+                      <span className="text-gray-900 text-xs font-bold">
                         {account.name.charAt(0).toUpperCase()}
                       </span>
                     )}
