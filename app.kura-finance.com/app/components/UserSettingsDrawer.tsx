@@ -21,7 +21,7 @@ const ConnectAccountModal = dynamic(() => import('./ConnectAccountModal'), {
 interface UserSettingsDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  anchorRef?: React.RefObject<HTMLButtonElement>;
+  anchorRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 export type ViewState = 'main' | 'profile' | 'accounts' | 'preferences';
