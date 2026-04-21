@@ -8,10 +8,16 @@ export function middleware(request: NextRequest) {
   const requestOrigin = request.nextUrl.origin;
   const isDevelopment = process.env.NODE_ENV === 'development';
 
+  // Define the app domain and API domain
+  const appDomain = process.env.NEXT_PUBLIC_APP_URL || requestOrigin;
+  const apiDomain = process.env.NEXT_PUBLIC_API_URL || 'https://api.kura-finance.com';
+
   // Define CSP sources
   const connectSources = [
     "'self'",
-    requestOrigin, // Allow requests to the current domain
+    requestOrigin,
+    appDomain,
+    apiDomain,
     'https://cdn.plaid.com',
     'https://*.plaid.com',
     'https://*.coingecko.com',
@@ -20,6 +26,8 @@ export function middleware(request: NextRequest) {
     'wss://*.reown.com',
     'https://api.reown.org',
     'https://static.cloudflareinsights.com', // Cloudflare Insights
+    'https://app.kura-finance.com', // Explicitly add app domain
+    'https://api.kura-finance.com', // Explicitly add API domain
     ...(isDevelopment ? ['ws://localhost', 'ws://127.0.0.1'] : []), // Allow WebSocket for dev HMR
   ].filter(Boolean).join(' ');
 
