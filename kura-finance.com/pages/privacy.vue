@@ -12,13 +12,17 @@
         <!-- 1. Information We Collect -->
         <section>
           <h2 class="text-2xl font-bold text-kura-text mb-4">1. Information We Collect</h2>
+          <p class="text-kura-text-secondary leading-relaxed">
             We collect information necessary to provide our Service, including account details, read-only financial data accessed via authorized APIs (e.g., Plaid), and public blockchain wallet addresses.
+          </p>
         </section>
 
         <!-- 2. How We Use Your Information -->
         <section>
           <h2 class="text-2xl font-bold text-kura-text mb-4">2. How We Use Your Information</h2>
+          <p class="text-kura-text-secondary leading-relaxed">
             Your data is used to provide the Kura Finance dashboard. We do not sell your raw personal or financial data.
+          </p>
         </section>
 
         <!-- 3. Third-Party Data Processors & Partners -->

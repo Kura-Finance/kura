@@ -12,13 +12,17 @@
         <!-- 1. Not Financial, Legal, or Tax Advice (NFA) -->
         <section>
           <h2 class="text-2xl font-bold text-kura-text mb-4">1. Not Financial, Legal, or Tax Advice (NFA)</h2>
+          <p class="text-kura-text-secondary leading-relaxed">
             All information, charts, data, and analytics provided on the Kura Finance platform are for informational, educational, and software utility purposes only. Nothing contained herein constitutes financial, investment, legal, tax, or credit-building advice. You should conduct your own research (DYOR) and consult with a licensed professional before making any financial decisions or interacting with decentralized protocols.
+          </p>
         </section>
 
         <!-- 2. Not a Consumer Reporting Agency (FCRA Exemption) -->
         <section>
           <h2 class="text-2xl font-bold text-kura-text mb-4">2. Not a Consumer Reporting Agency (FCRA Exemption)</h2>
+          <p class="text-kura-text-secondary leading-relaxed">
             Kura Finance LLC is a Web3 software infrastructure provider, not a Consumer Reporting Agency (CRA) as defined by the US Fair Credit Reporting Act (FCRA).
+          </p>
         </section>
 
         <!-- 3. Non-Custodial Nature & No Lending -->
