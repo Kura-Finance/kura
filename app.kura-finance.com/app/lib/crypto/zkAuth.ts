@@ -19,7 +19,11 @@ import {
   generateDataKey,
   getSRPSalts,
 } from './srpClient';
-import { registerUser } from '@/lib/authApi';
+import {
+  registerUser,
+  resetPassword as apiResetPassword,
+  changePassword as apiChangePassword,
+} from '@/lib/authApi';
 
 // ─────────────────────────────────────────
 // Crypto Session（記憶體中，登出後清除）
@@ -96,6 +100,65 @@ export async function zkRegister(email: string, password: string): Promise<{ use
   );
 
   return { user: response.user };
+}
+
+// ─────────────────────────────────────────
+// ZK 密碼重設與變更
+// ─────────────────────────────────────────
+
+/**
+ * ZK 忘記密碼 (Password Reset)：
+ * 用戶輸入 email、驗證碼與新密碼。
+ * 因為沒有舊密碼，無法解開舊的 Data Key。
+ * 必須生成全新的 SRP Verifier 與全新的 Data Key。舊的加密資料將遺失。
+ */
+export async function zkResetPassword(email: string, code: string, newPassword: string): Promise<void> {
+  const normalizedEmail = email.toLowerCase().trim();
+  const srpSalt = generateSalt();
+  const kekSalt = generateSalt();
+
+  // 1. 推導新金鑰
+  const { kek, authKeyHex } = await deriveKeysFromPassword(newPassword, srpSalt, kekSalt);
+  const { srpVerifier } = await computeVerifier(normalizedEmail, authKeyHex, srpSalt);
+
+  // 2. 生成全新 Data Key 並加密
+  const { plainDataKey } = await generateDataKey();
+  const encryptedDataKey = await sealDataKey(plainDataKey, kek);
+
+  // 3. 上傳給後端
+  await apiResetPassword(normalizedEmail, code, srpSalt, srpVerifier, encryptedDataKey, kekSalt);
+
+  // 4. 重設密碼後，需要讓用戶重新手動登入以建立 session
+  clearCryptoSession();
+}
+
+/**
+ * ZK 更改密碼 (Change Password)：
+ * 用戶已登入，輸入新密碼。
+ * 因為目前已登入，所以 cryptoSession 中有明文的 Data Key。
+ * 重新推導新 KEK，並將現有 Data Key 重新加密上傳，不遺失資料。
+ */
+export async function zkChangePassword(email: string, newPassword: string): Promise<void> {
+  if (!cryptoSession) {
+    throw new Error('No active crypto session. Please log in again.');
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+  const srpSalt = generateSalt();
+  const kekSalt = generateSalt();
+
+  // 1. 推導新金鑰
+  const { kek, authKeyHex } = await deriveKeysFromPassword(newPassword, srpSalt, kekSalt);
+  const { srpVerifier } = await computeVerifier(normalizedEmail, authKeyHex, srpSalt);
+
+  // 2. 用新的 KEK 重新加密現有的明文 Data Key
+  const encryptedDataKey = await sealDataKey(cryptoSession.dataKeyHex, kek);
+
+  // 3. 上傳給後端
+  await apiChangePassword(srpSalt, srpVerifier, encryptedDataKey, kekSalt);
+
+  // 4. 更新記憶體中的 session KEK
+  cryptoSession.kek = kek;
 }
 
 // ─────────────────────────────────────────

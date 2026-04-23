@@ -4,13 +4,11 @@ import {
   updateCurrentUserProfile,
   registerUser,
   logoutUser,
-  changePassword as changePasswordApi,
   requestPasswordReset as requestPasswordResetApi,
-  resetPassword as resetPasswordApi,
   requestRegisterToken as requestRegisterTokenApi,
   confirmRegister as confirmRegisterApi,
 } from '@/lib/authApi';
-import { zkLogin, zkRegister, clearCryptoSession } from '@/lib/crypto/zkAuth';
+import { zkLogin, zkRegister, clearCryptoSession, zkChangePassword, zkResetPassword } from '@/lib/crypto/zkAuth';
 import {
   createPlaidLinkToken,
   exchangePlaidPublicToken,
@@ -60,9 +58,9 @@ interface AppState {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  changePassword: (oldPassword: string, newPassword: string) => Promise<void>;
-  requestPasswordReset: (email: string) => Promise<{ resetToken?: string }>;
-  resetPassword: (resetToken: string, newPassword: string) => Promise<void>;
+  changePassword: (newPassword: string) => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  resetPassword: (email: string, resetCode: string, newPassword: string) => Promise<void>;
   requestRegisterToken: (email: string) => Promise<{ registerToken?: string }>;
   confirmRegister: (email: string, password: string, registerToken: string) => Promise<void>;
   hydrateFromStorage: () => Promise<void>;
@@ -197,10 +195,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
-  changePassword: async (oldPassword: string, newPassword: string) => {
+  changePassword: async (newPassword: string) => {
     try {
-      console.debug('[AppStore] Changing password');
-      await changePasswordApi(oldPassword, newPassword);
+      console.debug('[AppStore] Changing password (SRP)');
+      const email = get().userProfile?.email;
+      if (!email) throw new Error('未取得目前用戶信箱');
+      await zkChangePassword(email, newPassword);
       console.info('[AppStore] Password changed successfully');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Password change failed';
@@ -212,9 +212,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   requestPasswordReset: async (email: string) => {
     try {
       console.debug('[AppStore] Requesting password reset', { email });
-      const response = await requestPasswordResetApi(email);
-      console.info('[AppStore] Password reset email sent', { resetToken: response.resetToken });
-      return { resetToken: response.resetToken };
+      await requestPasswordResetApi(email);
+      console.info('[AppStore] Password reset email sent');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Password reset request failed';
       console.error('[AppStore] Password reset request failed', { error: errorMessage });
@@ -222,11 +221,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
-  resetPassword: async (resetToken: string, newPassword: string) => {
+  resetPassword: async (email: string, resetCode: string, newPassword: string) => {
     try {
-      console.debug('[AppStore] Resetting password with token');
-      await resetPasswordApi(resetToken, newPassword);
+      console.debug('[AppStore] Resetting password with ZK protocol');
+      await zkResetPassword(email, resetCode, newPassword);
       console.info('[AppStore] Password reset successfully');
+      
+      // 因為舊 Data Key 已失效，系統需要登出讓用戶重新登入
+      get().clearAuthSession();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
       console.error('[AppStore] Password reset failed', { error: errorMessage });

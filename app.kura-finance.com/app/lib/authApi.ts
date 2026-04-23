@@ -160,45 +160,49 @@ export const updateCurrentUserProfile = (
 };
 
 /**
- * 改变密码
- * Cookie 会自动发送，无需手动传递 token
+ * 改变密码 (SRP)
  */
 export const changePassword = (
-  oldPassword: string,
-  newPassword: string
+  srpSalt: string,
+  srpVerifier: string,
+  encryptedDataKey: string,
+  kekSalt: string
 ): Promise<{ message: string }> => {
   return apiRequest<{ message: string }>(
     '/api/auth/change-password',
     {
       method: 'POST',
-      body: JSON.stringify({ oldPassword, newPassword }),
+      body: JSON.stringify({ srpSalt, srpVerifier, encryptedDataKey, kekSalt }),
     }
   );
 };
 
 /**
- * 忘记密码 - 请求重置
+ * 忘记密码 - 发送重置码
  */
-export const requestPasswordReset = (email: string): Promise<{ message: string; resetToken?: string }> => {
-  // Normalize email: lowercase and trim
+export const requestPasswordReset = (email: string): Promise<{ message: string; expiresIn?: number }> => {
   const normalizedEmail = email.toLowerCase().trim();
 
-  return apiRequest<{ message: string; resetToken?: string }>('/api/auth/request-reset', {
+  return apiRequest<{ message: string; expiresIn?: number }>('/api/auth/password-reset/send-code', {
     method: 'POST',
     body: JSON.stringify({ email: normalizedEmail }),
   });
 };
 
 /**
- * 忘记密码 - 重置密码
+ * 忘记密码 - 验证重置码并重设 SRP (SRP)
  */
 export const resetPassword = (
-  resetToken: string,
-  newPassword: string
+  email: string,
+  resetCode: string,
+  srpSalt: string,
+  srpVerifier: string,
+  encryptedDataKey: string,
+  kekSalt: string
 ): Promise<{ message: string }> => {
-  return apiRequest<{ message: string }>('/api/auth/reset-password', {
+  return apiRequest<{ message: string }>('/api/auth/password-reset/verify', {
     method: 'POST',
-    body: JSON.stringify({ resetToken, newPassword }),
+    body: JSON.stringify({ email, resetCode, srpSalt, srpVerifier, encryptedDataKey, kekSalt }),
   });
 };
 
