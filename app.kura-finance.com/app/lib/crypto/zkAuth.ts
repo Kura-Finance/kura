@@ -53,11 +53,21 @@ export function clearCryptoSession(): void {
 export async function zkLogin(email: string, password: string): Promise<{ user: any }> {
   const normalizedEmail = email.toLowerCase().trim();
 
-  // Step 1: 取得 salt（後端不知道密碼）
-  const { srpSalt, kekSalt } = await getSRPSalts(normalizedEmail);
+  // Step 1: 取得 salt，順便確認帳號是否已啟用 SRP
+  const salts = await getSRPSalts(normalizedEmail);
+
+  if (!salts.srpEnabled) {
+    // 帳號存在但尚未升級 SRP（或帳號不存在）
+    // 拋出讓 useAppStore 的 catch 走 legacy 路徑，不跑 PBKDF2
+    throw new Error('SRP_NOT_ENABLED');
+  }
 
   // Step 2: 推導金鑰（純 client，password 不離開此函式）
-  const { kek, authKeyHex } = await deriveKeysFromPassword(password, srpSalt, kekSalt);
+  const { kek, authKeyHex } = await deriveKeysFromPassword(
+    password,
+    salts.srpSalt,
+    salts.kekSalt,
+  );
 
   // Step 3: SRP 完整握手
   const { user, encryptedDataKey, kekSalt: serverKekSalt } = await srpFullLogin(

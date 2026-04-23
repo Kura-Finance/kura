@@ -136,7 +136,11 @@ export async function srpFullLogin(
 }
 
 /** 取得 email 對應的 salt（外部使用） */
-export async function getSRPSalts(email: string): Promise<{ srpSalt: string; kekSalt: string }> {
+export async function getSRPSalts(email: string): Promise<{
+  srpSalt: string;
+  kekSalt: string;
+  srpEnabled: boolean;
+}> {
   return srpPost('/api/auth/srp/salt', { email });
 }
 
