@@ -11,7 +11,7 @@ import {
   requestRegisterToken as requestRegisterTokenApi,
   confirmRegister as confirmRegisterApi,
 } from '@/lib/authApi';
-import { zkLogin, zkLoginLegacy, zkRegister, clearCryptoSession } from '@/lib/crypto/zkAuth';
+import { zkLogin, zkRegister, clearCryptoSession } from '@/lib/crypto/zkAuth';
 import {
   createPlaidLinkToken,
   exchangePlaidPublicToken,
@@ -111,15 +111,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       console.debug('[AppStore] Attempting ZK login', { email: normalizedEmail });
       set({ authStatus: 'loading', authError: null });
 
-      let response;
-      try {
-        // 嘗試 SRP 零知識登入（密碼不傳後端）
-        response = await zkLogin(normalizedEmail, password);
-      } catch (srpErr) {
-        // 若帳號尚未升級 SRP，fallback 至舊版並自動觸發升級
-        console.warn('[AppStore] SRP login failed, falling back to legacy', srpErr);
-        response = await zkLoginLegacy(normalizedEmail, password);
-      }
+      const response = await zkLogin(normalizedEmail, password);
 
       set({
         authToken: 'web-client',

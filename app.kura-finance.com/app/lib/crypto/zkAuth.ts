@@ -19,7 +19,7 @@ import {
   generateDataKey,
   getSRPSalts,
 } from './srpClient';
-import { loginUser, registerUser } from '@/lib/authApi';
+import { registerUser } from '@/lib/authApi';
 
 // ─────────────────────────────────────────
 // Crypto Session（記憶體中，登出後清除）
@@ -82,26 +82,6 @@ export async function zkLogin(email: string, password: string): Promise<{ user: 
 }
 
 // ─────────────────────────────────────────
-// ZK 登入（舊版 fallback + 自動升級）
-// ─────────────────────────────────────────
-
-/**
- * 舊版 bcrypt 登入（帳號尚未升級 SRP 時使用）
- * 登入成功後自動在背景升級
- */
-export async function zkLoginLegacy(email: string, password: string): Promise<{ user: any }> {
-  const normalizedEmail = email.toLowerCase().trim();
-  const response = await loginUser(normalizedEmail, password);
-
-  // 背景升級至 SRP（不阻塞登入）
-  upgradeLegacyAccountToSRP(normalizedEmail, password).catch((e) =>
-    console.warn('[ZK] SRP upgrade failed (will retry next login):', e),
-  );
-
-  return { user: response.user };
-}
-
-// ─────────────────────────────────────────
 // ZK 註冊
 // ─────────────────────────────────────────
 
@@ -143,7 +123,4 @@ async function setupSRPForNewAccount(email: string, password: string): Promise<v
   console.info('[ZK] SRP setup complete');
 }
 
-async function upgradeLegacyAccountToSRP(email: string, password: string): Promise<void> {
-  await setupSRPForNewAccount(email, password);
-  console.info('[ZK] Legacy account upgraded to SRP');
-}
+
