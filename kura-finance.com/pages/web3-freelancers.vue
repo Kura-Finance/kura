@@ -27,7 +27,7 @@
           <div class="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
             <a href="https://app.kura-finance.com" target="_blank" rel="noopener noreferrer" 
                class="inline-block px-8 py-4 rounded-lg bg-gradient-to-r from-kura-primary to-kura-secondary text-white font-semibold hover:shadow-lg hover:shadow-kura-primary/50 transition-all duration-300">
-              Build Your Web3 Credit
+              Get Started Today
             </a>
             <NuxtLink to="/about" 
                class="inline-block px-8 py-4 rounded-lg border border-kura-primary text-kura-primary font-semibold hover:bg-kura-primary/10 transition-all duration-300">
@@ -43,10 +43,10 @@
       <div class="max-w-6xl mx-auto">
         <div class="text-center mb-16">
           <h2 class="text-4xl md:text-5xl font-bold mb-6">
-            The Three Pillars of Web3 Freelancer Finance
+            The Foundation of Web3 Freelancer Finance
           </h2>
           <p class="text-lg text-kura-text-secondary max-w-3xl mx-auto">
-            Real-time accounting, institutional credit, and privacy-first income verification.
+            Real-time accounting and institutional-grade tools for independent professionals.
           </p>
         </div>
 
@@ -60,7 +60,7 @@
             </div>
             <div class="order-1 md:order-2 space-y-6">
               <div>
-                <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">Pillar 1</p>
+                <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">Core Feature</p>
                 <h3 class="text-3xl md:text-4xl font-bold mb-4">
                   Automated Crypto Accounting
                 </h3>
@@ -97,101 +97,7 @@
             </div>
           </div>
 
-          <div class="h-px bg-gradient-to-r from-transparent via-kura-border to-transparent" />
 
-          <!-- Pillar 2 -->
-          <div class="grid md:grid-cols-2 gap-8 items-start">
-            <div class="space-y-6">
-              <div>
-                <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">Pillar 2</p>
-                <h3 class="text-3xl md:text-4xl font-bold mb-4">
-                  Build Your Web3 Credit Asset
-                </h3>
-              </div>
-              <p class="text-lg text-kura-text-secondary leading-relaxed">
-                Traditional finance ignores your crypto income. Kura transforms your verified on-chain earnings and repayment history into institutional-grade identity (KDID). Prove your financial health to the world without exposing your real wallet addresses.
-              </p>
-              <div class="space-y-3 pt-4">
-                <div class="flex gap-3">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-kura-primary/20 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-kura-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <span class="text-kura-text-secondary">Mint your KDID as institutional-grade identity across protocols</span>
-                </div>
-                <div class="flex gap-3">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-kura-primary/20 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-kura-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <span class="text-kura-text-secondary">Build a portable credit history recognized by DeFi protocols</span>
-                </div>
-                <div class="flex gap-3">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-kura-primary/20 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-kura-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <span class="text-kura-text-secondary">Prove financial health without exposing wallet addresses</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="rounded-xl bg-kura-background-light border border-kura-border p-8 h-64 flex items-center justify-center">
-                <div class="text-center text-kura-text-secondary">KDID Identity Card</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="h-px bg-gradient-to-r from-transparent via-kura-border to-transparent" />
-
-          <!-- Pillar 3 -->
-          <div class="grid md:grid-cols-2 gap-8 items-start">
-            <div class="order-2 md:order-1">
-              <div class="rounded-xl bg-kura-background-light border border-kura-border p-8 h-64 flex items-center justify-center">
-                <div class="text-center text-kura-text-secondary">ZK Proof Certificate</div>
-              </div>
-            </div>
-            <div class="order-1 md:order-2 space-y-6">
-              <div>
-                <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">Pillar 3</p>
-                <h3 class="text-3xl md:text-4xl font-bold mb-4">
-                  ZK Proof of Income
-                </h3>
-              </div>
-              <p class="text-lg text-kura-text-secondary leading-relaxed">
-                Need to prove income to a landlord or traditional institution? Stop uploading your entire transaction history. Kura generates zero-knowledge proofs that mathematically prove your financial capacity while preserving absolute privacy. Math, not trust.
-              </p>
-              <div class="space-y-3 pt-4">
-                <div class="flex gap-3">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-kura-primary/20 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-kura-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <span class="text-kura-text-secondary">Generate zero-knowledge proofs of income for verification</span>
-                </div>
-                <div class="flex gap-3">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-kura-primary/20 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-kura-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <span class="text-kura-text-secondary">Prove income thresholds without sharing detailed transaction data</span>
-                </div>
-                <div class="flex gap-3">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-kura-primary/20 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-kura-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <span class="text-kura-text-secondary">Privacy-first approach to financial credential sharing</span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -287,8 +193,8 @@
             Track earnings. Build credit. Prove income. All while keeping your privacy intact.
           </p>
           <a href="https://app.kura-finance.com" target="_blank" rel="noopener noreferrer" 
-             class="inline-block px-8 py-4 rounded-lg bg-gradient-to-r from-kura-primary to-kura-secondary text-white font-semibold hover:shadow-lg hover:shadow-kura-primary/50 transition-all duration-300">
-            Start Building Your Web3 Credit Today
+              class="inline-block px-8 py-4 rounded-lg bg-gradient-to-r from-kura-primary to-kura-secondary text-white font-semibold hover:shadow-lg hover:shadow-kura-primary/50 transition-all duration-300">
+            Get Started Today
           </a>
         </div>
       </div>
@@ -302,11 +208,11 @@ definePageMeta({
 });
 
 useSeoMeta({
-  title: 'For Web3 Freelancers | Build Your Crypto Credit - Kura Finance',
-  description: 'Web3 freelancer financial freedom. Track crypto income, build institutional credit with KDID, and prove earnings with zero-knowledge proofs. Automated accounting for digital nomads.',
-  keywords: 'Web3 freelancer, crypto income tracking, KDID identity, zero-knowledge proof, crypto accounting, freelancer taxes, DeFi credit, USDT USDC tracking',
+  title: 'For Web3 Freelancers | Master Your Finance - Kura Finance',
+  description: 'Web3 freelancer financial freedom. Track crypto income and automate accounting.',
+  keywords: 'Web3 freelancer, crypto income tracking, crypto accounting, freelancer taxes, USDT USDC tracking',
   ogTitle: 'For Web3 Freelancers | Reclaim Financial Control',
-  ogDescription: 'Earn USDT. Spend USDC. Hold ETH. Build your Web3 credit asset.',
+  ogDescription: 'Earn USDT. Spend USDC. Hold ETH. Master your finance.',
   ogUrl: 'https://kura-finance.com/web3-freelancers',
   ogType: 'website',
   twitterCard: 'summary_large_image',

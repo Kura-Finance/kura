@@ -12,7 +12,7 @@
         <!-- 1. Information We Collect -->
         <section>
           <h2 class="text-2xl font-bold text-kura-text mb-4">1. Information We Collect</h2>
-            We collect information necessary to provide our Service, including account details, read-only financial data accessed via authorized APIs (e.g., Plaid), and public blockchain wallet addresses. For users opting into the Kura Decentralized ID (KDID) features, we may process identity verification data through authorized third-party KYC providers.
+            We collect information necessary to provide our Service, including account details, read-only financial data accessed via authorized APIs (e.g., Plaid), and public blockchain wallet addresses.
         </section>
 
         <!-- 2. How We Use Your Information -->

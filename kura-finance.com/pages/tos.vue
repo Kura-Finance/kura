@@ -21,7 +21,7 @@
         <section>
           <h2 class="text-2xl font-bold text-kura-text mb-4">2. Description of Service</h2>
           <p class="text-kura-text-secondary leading-relaxed">
-            Kura Finance provides a read-only financial data aggregation dashboard and decentralized identity verification (KDID). We do not execute trades, hold assets, act as a custodian, or provide financial, legal, or tax advice.
+            Kura Finance provides a read-only financial data aggregation dashboard. We do not execute trades, hold assets, act as a custodian, or provide financial, legal, or tax advice.
           </p>
         </section>
 
@@ -30,7 +30,7 @@
         <section>
           <h2 class="text-2xl font-bold text-kura-text mb-4">4. Oracle Liability & Third-Party APIs</h2>
           <p class="text-kura-text-secondary leading-relaxed">
-            Our Service relies on data provided by authorized third-party fiat APIs (e.g., Plaid) and blockchain RPC nodes. We do not guarantee the real-time accuracy, uptime, or completeness of this external data. Kura Finance shall not be held liable for any financial losses or adverse actions resulting from delayed data synchronization, API outages, or fluctuations in your KDID status.
+            Our Service relies on data provided by authorized third-party fiat APIs (e.g., Plaid) and blockchain RPC nodes. We do not guarantee the real-time accuracy, uptime, or completeness of this external data. Kura Finance shall not be held liable for any financial losses or adverse actions resulting from delayed data synchronization, API outages, or fluctuations in your connected accounts.
           </p>
         </section>
 

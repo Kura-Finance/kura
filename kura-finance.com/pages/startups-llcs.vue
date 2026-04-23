@@ -190,7 +190,7 @@
             Ready to Transform Your Treasury?
           </h2>
           <p class="text-lg text-kura-text-secondary max-w-2xl mx-auto">
-            Consolidate your finances. Unlock capital. Build legal trust infrastructure on the blockchain.
+            Consolidate your finances and manage your treasury securely.
           </p>
           <a href="https://app.kura-finance.com" target="_blank" rel="noopener noreferrer" 
              class="inline-block px-8 py-4 rounded-lg bg-gradient-to-r from-kura-primary to-kura-secondary text-white font-semibold hover:shadow-lg hover:shadow-kura-primary/50 transition-all duration-300">

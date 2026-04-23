@@ -49,24 +49,6 @@ Wilmington, DE 19801
           </div>
         </section>
 
-        <!-- Identity & Data Verification (KDID) -->
-        <section>
-          <h2 class="text-2xl font-bold text-kura-text mb-4">Identity & Data Verification (KDID)</h2>
-          <div class="space-y-4">
-            <div>
-              <h3 class="text-lg font-semibold text-kura-text mb-2">Institutional KYC Partners:</h3>
-              <p class="text-kura-text-secondary leading-relaxed">
-                To maintain a Sybil-resistant ecosystem and issue Kura Decentralized IDs (KDID), we partner with top-tier, globally compliant identity verification providers (e.g., Sumsub).
-              </p>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-kura-text mb-2">Data Minimization:</h3>
-              <p class="text-kura-text-secondary leading-relaxed">
-                Kura Finance does not directly store your raw biometric data or physical ID scans on our primary databases. We only retain the cryptographic verification status and the corresponding DID identifier.
-              </p>
-            </div>
-          </div>
-        </section>
 
         <!-- Regulatory Framework & Compliance Stance -->
         <section>

@@ -18,7 +18,7 @@
         <!-- 2. Not a Consumer Reporting Agency (FCRA Exemption) -->
         <section>
           <h2 class="text-2xl font-bold text-kura-text mb-4">2. Not a Consumer Reporting Agency (FCRA Exemption)</h2>
-            Kura Finance LLC is a Web3 software infrastructure provider, not a Consumer Reporting Agency (CRA) as defined by the US Fair Credit Reporting Act (FCRA). The Kura Decentralized ID (KDID) is a proprietary on-chain risk assessment tool designed strictly for use within Decentralized Finance (DeFi) ecosystems. It is explicitly not intended to be used for traditional consumer credit, mortgage, employment, insurance, or housing eligibility decisions.
+            Kura Finance LLC is a Web3 software infrastructure provider, not a Consumer Reporting Agency (CRA) as defined by the US Fair Credit Reporting Act (FCRA).
         </section>
 
         <!-- 3. Non-Custodial Nature & No Lending -->

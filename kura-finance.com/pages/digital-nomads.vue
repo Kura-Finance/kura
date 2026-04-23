@@ -27,7 +27,7 @@
           <div class="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
             <a href="https://app.kura-finance.com" target="_blank" rel="noopener noreferrer" 
                class="inline-block px-8 py-4 rounded-lg bg-gradient-to-r from-kura-primary to-kura-secondary text-white font-semibold hover:shadow-lg hover:shadow-kura-primary/50 transition-all duration-300">
-              Claim Your Global Identity
+              Get Started Today
             </a>
             <NuxtLink to="/about" 
                class="inline-block px-8 py-4 rounded-lg border border-kura-primary text-kura-primary font-semibold hover:bg-kura-primary/10 transition-all duration-300">
@@ -43,10 +43,10 @@
       <div class="max-w-6xl mx-auto">
         <div class="text-center mb-16">
           <h2 class="text-4xl md:text-5xl font-bold mb-6">
-            The Three Pillars of Global Nomad Finance
+            The Foundation of Global Nomad Finance
           </h2>
           <p class="text-lg text-kura-text-secondary max-w-3xl mx-auto">
-            Multi-currency alignment, borderless proof of funds, and seamless lifestyle integration.
+            Multi-currency alignment and seamless lifestyle integration.
           </p>
         </div>
 
@@ -60,7 +60,7 @@
             </div>
             <div class="order-1 md:order-2 space-y-6">
               <div>
-                <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">Pillar 1</p>
+                <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">Core Feature</p>
                 <h3 class="text-3xl md:text-4xl font-bold mb-4">
                   Global Multi-Currency Dashboard
                 </h3>
@@ -97,56 +97,6 @@
             </div>
           </div>
 
-          <div class="h-px bg-gradient-to-r from-transparent via-kura-border to-transparent" />
-
-          <!-- Pillar 2 -->
-          <div class="grid md:grid-cols-2 gap-8 items-start">
-            <div class="space-y-6">
-              <div>
-                <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">Pillar 2</p>
-                <h3 class="text-3xl md:text-4xl font-bold mb-4">
-                  Zero-Knowledge Proof of Funds
-                </h3>
-              </div>
-              <p class="text-lg text-kura-text-secondary leading-relaxed">
-                Moving to a new city requires a visa or apartment rental? Stop submitting sensitive bank statements with full account numbers and personal details. With Kura, generate cryptographically valid ZK proofs of funds that elegantly and securely transcend traditional bureaucratic scrutiny. Prove your financial capacity without exposing your financial details.
-              </p>
-              <div class="space-y-3 pt-4">
-                <div class="flex gap-3">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-kura-primary/20 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-kura-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <span class="text-kura-text-secondary">Generate zero-knowledge proofs for visa and rental applications</span>
-                </div>
-                <div class="flex gap-3">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-kura-primary/20 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-kura-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <span class="text-kura-text-secondary">Prove financial thresholds without revealing account details</span>
-                </div>
-                <div class="flex gap-3">
-                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-kura-primary/20 flex items-center justify-center">
-                    <svg class="w-4 h-4 text-kura-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                  <span class="text-kura-text-secondary">Mathematically verified proof of assets across borders</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="rounded-xl bg-kura-background-light border border-kura-border p-8 h-64 flex items-center justify-center">
-                <div class="text-center text-kura-text-secondary">ZK Proof Certificate</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="h-px bg-gradient-to-r from-transparent via-kura-border to-transparent" />
-
           <!-- Pillar 3 -->
           <div class="grid md:grid-cols-2 gap-8 items-start">
             <div class="order-2 md:order-1">
@@ -156,7 +106,7 @@
             </div>
             <div class="order-1 md:order-2 space-y-6">
               <div>
-                <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">Pillar 3</p>
+                <p class="text-sm font-semibold text-kura-primary uppercase tracking-wider mb-2">Core Feature</p>
                 <h3 class="text-3xl md:text-4xl font-bold mb-4">
                   Plug-and-Play Nomad Finance
                 </h3>
@@ -225,21 +175,7 @@
             </div>
           </div>
 
-          <div class="p-8 rounded-xl bg-white border border-kura-border hover:border-kura-primary/50 transition-all duration-300">
-            <div class="flex gap-4 mb-4">
-              <div class="flex-shrink-0">
-                <div class="flex items-center justify-center h-10 w-10 rounded-lg bg-kura-primary/20 text-kura-primary">
-                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-              <div>
-                <h3 class="font-bold text-kura-text mb-2">Privacy Maximized</h3>
-                <p class="text-kura-text-secondary">Zero-knowledge architecture. Your financial data remains encrypted and never exposed to third parties.</p>
-              </div>
-            </div>
-          </div>
+
 
           <div class="p-8 rounded-xl bg-white border border-kura-border hover:border-kura-primary/50 transition-all duration-300">
             <div class="flex gap-4 mb-4">
@@ -288,7 +224,7 @@
           </p>
           <a href="https://app.kura-finance.com" target="_blank" rel="noopener noreferrer" 
              class="inline-block px-8 py-4 rounded-lg bg-gradient-to-r from-kura-primary to-kura-secondary text-white font-semibold hover:shadow-lg hover:shadow-kura-primary/50 transition-all duration-300">
-            Claim Your Global Identity Today
+            Get Started Today
           </a>
         </div>
       </div>
@@ -303,8 +239,8 @@ definePageMeta({
 
 useSeoMeta({
   title: 'For Digital Nomads | Multi-Currency Global Finance - Kura Finance',
-  description: 'Global financial identity for digital nomads. Manage USD, EUR, and crypto in one dashboard. Zero-knowledge proofs for visas and rentals. Multi-currency tracking and FX optimization.',
-  keywords: 'digital nomad, multi-currency management, global finance, zero-knowledge proof, international money transfer, expat banking, crypto nomad, currency conversion',
+  description: 'Global financial management for digital nomads. Manage USD, EUR, and crypto in one dashboard. Multi-currency tracking and FX optimization.',
+  keywords: 'digital nomad, multi-currency management, global finance, international money transfer, expat banking, crypto nomad, currency conversion',
   ogTitle: 'For Digital Nomads | Borderless Financial Identity',
   ogDescription: 'Master your global finances across all currencies and chains.',
   ogUrl: 'https://kura-finance.com/digital-nomads',

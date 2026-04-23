@@ -146,12 +146,6 @@ const milestones = reactive([
     title: 'Bridging Fiat & On-Chain Data',
     content: 'We launched the Kura Dashboard to solve our own pain points—creating a unified interface capable of securely reading on-chain assets while tracking traditional bank accounts.',
     type: 'info'
-  },
-  {
-    time: 'Phase 2: Digital Identity',
-    title: 'KDID & Institutional Verification',
-    content: 'Implementing robust KYC and integration with top-tier Web3 DID protocols (Palau RNS.id, Worldcoin) to establish a baseline of Sybil-resistant identities.',
-    type: 'success'
   }
 ])
 </script>
