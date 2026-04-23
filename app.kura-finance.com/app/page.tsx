@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import { AuthApiError } from '@/lib/authApi';
-import { zkLogin, zkRegister } from '@/lib/crypto/zkAuth';
 
 export default function RootHubPage() {
   const authStatus = useAppStore((state) => state.authStatus);
@@ -15,8 +14,9 @@ export default function RootHubPage() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
+  const login = useAppStore((state) => state.login);
+  const signup = useAppStore((state) => state.signup);
   const setPlaidLinkToken = useAppStore((state) => state.setPlaidLinkToken);
-  const hydrateUserProfile = useAppStore((state) => state.hydrateUserProfile);
 
   // Redirect to dashboard if authenticated
   useEffect(() => {
@@ -38,15 +38,12 @@ export default function RootHubPage() {
 
     try {
       if (authMode === 'register') {
-        // 建立帳號並在背景設定 SRP
-        await zkRegister(email.trim(), password);
+        await signup(email.trim(), password);
       } else {
-        // SRP 零知識登入
-        await zkLogin(email.trim(), password);
+        await login(email.trim(), password);
       }
 
       setPlaidLinkToken(null);
-      await hydrateUserProfile();
     } catch (error) {
       const message = error instanceof AuthApiError ? error.message : 'Authentication failed.';
       setAuthError(message);

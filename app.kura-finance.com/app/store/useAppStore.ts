@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import {
   fetchCurrentUserProfile,
   updateCurrentUserProfile,
-  loginUser,
   registerUser,
   logoutUser,
   changePassword as changePasswordApi,

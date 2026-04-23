@@ -121,16 +121,7 @@ export const registerUser = (email: string, password: string): Promise<AuthRespo
   });
 };
 
-/**
- * 用户登录
- */
-export const loginUser = (email: string, password: string): Promise<AuthResponse> => {
-  const normalizedEmail = email.toLowerCase().trim();
-  return apiRequest<AuthResponse>('/api/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ email: normalizedEmail, password }),
-  });
-};
+
 
 /**
  * 用户登出

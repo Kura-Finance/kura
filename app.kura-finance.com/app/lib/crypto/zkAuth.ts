@@ -56,9 +56,7 @@ export async function zkLogin(email: string, password: string): Promise<{ user: 
   // Step 1: 取得 salt — 同時確認此帳號是否已啟用 SRP
   const salts = await getSRPSalts(normalizedEmail);
   if (!salts.srpEnabled) {
-    // 帳號尚未設定 SRP verifier，提早拋出讓 page.tsx fallback 至 legacy 路徑
-    // 避免無謂跑 600k PBKDF2 然後必然失敗
-    throw new Error('SRP not configured for this account');
+    throw new Error('Your account requires a security upgrade. Please reset your password to continue.');
   }
 
   const { srpSalt, kekSalt } = salts;
