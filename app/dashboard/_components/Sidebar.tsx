@@ -1,7 +1,6 @@
 // dashboard 側邊導覽元件
 "use client";
 
-import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';

@@ -126,7 +126,7 @@ function ConnectAccountModalContent({
   });
 
   const fetchPlaidLinkToken = useCallback(
-    async () => {
+    async (): Promise<string | null> => {
       try {
         setPlaidError(null);
         console.debug('[ConnectAccountModal] Requesting Plaid link token');
@@ -139,6 +139,7 @@ function ConnectAccountModalContent({
 
         setPlaidLinkToken(result.link_token);
         console.info('[ConnectAccountModal] Link token received');
+        return result.link_token;
       } catch (error) {
         let message = 'Failed to initialize Plaid. Please try again.';
 
@@ -164,6 +165,7 @@ function ConnectAccountModalContent({
 
         setPlaidError(message);
         console.error('[ConnectAccountModal] Failed to fetch link token:', { error, message });
+        return null;
       }
     },
     [setPlaidLinkToken]
@@ -185,13 +187,13 @@ function ConnectAccountModalContent({
     setIsConnecting('plaid');
 
     try {
-      // 必要時先取得 token
-      if (!linkToken) {
-        console.debug('[ConnectAccountModal] Fetching link token');
-        await fetchPlaidLinkToken();
+      let activeToken = linkToken;
 
-        // 再次確認 token 是否成功取得
-        if (!linkToken) {
+      // 必要時先取得 token
+      if (!activeToken) {
+        console.debug('[ConnectAccountModal] Fetching link token');
+        activeToken = await fetchPlaidLinkToken();
+        if (!activeToken) {
           setPlaidError('Failed to load Plaid Link. Please check your connection and try again.');
           return;
         }
@@ -444,7 +446,7 @@ export default function ConnectAccountModal(props: ConnectAccountModalProps) {
           </motion.div>
         </div>
       )}
-      {isPlaidReady && linkToken && (
+      {isPlaidReady && props.isOpen && (
         <ConnectAccountModalContent {...props} linkToken={linkToken} />
       )}
     </>,
