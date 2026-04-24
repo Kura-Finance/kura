@@ -30,7 +30,12 @@ export default function DashboardPage() {
 
   const totalBalance = useMemo(() => {
     return accounts.reduce((acc, curr) => {
-      return curr.type === 'credit' ? acc - curr.balance : acc + curr.balance;
+      const normalizedBalance = Number(curr.balance) || 0;
+      const contribution =
+        curr.type === 'credit'
+          ? -Math.abs(normalizedBalance) // 信用卡一律視為負債，避免來源正負號不一致造成誤加總
+          : normalizedBalance;
+      return acc + contribution;
     }, 0);
   }, [accounts]);
 
