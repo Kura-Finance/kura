@@ -2,6 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/useAppStore';
 
 export default function RootHubPage() {
@@ -25,12 +30,21 @@ export default function RootHubPage() {
   const requestRegistrationCode = useAppStore((state) => state.requestRegistrationCode);
   const verifyRegistration = useAppStore((state) => state.verifyRegistration);
 
-  // 已登入時導向 dashboard
   useEffect(() => {
     if (authStatus === 'authenticated') {
       router.push('/dashboard');
     }
   }, [authStatus, router]);
+
+  const resetToLogin = () => {
+    setAuthMode('login');
+    setAuthError(null);
+    setSuccessMessage(null);
+    setResetStep('request');
+    setResetCode('');
+    setRegistrationStep('request');
+    setRegistrationCode('');
+  };
 
   const handleAuthSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -122,7 +136,6 @@ export default function RootHubPage() {
     }
   };
 
-  // 顯示載入狀態
   if (authStatus === 'loading') {
     return (
       <div className="flex-1 flex justify-center items-center p-10">
@@ -136,197 +149,157 @@ export default function RootHubPage() {
     );
   }
 
-  // 未登入時顯示登入頁
   if (authStatus === 'unauthenticated') {
     return (
-      <div className="flex-1 flex justify-center items-center p-10">
+      <div className="flex-1 flex justify-center items-center p-6 md:p-10">
         <div className="w-full max-w-md">
-          <div className="rounded-3xl border border-[#1A1A24] bg-gradient-to-br from-[#1A1A24]/40 to-[#0B0B0F]/40 backdrop-blur-xl p-8 flex flex-col justify-center items-center text-center">
-            <h1 className="text-4xl font-bold mb-2 tracking-tight text-white">Kura Finance</h1>
-            <p className="text-sm text-gray-400 mb-8">
-              Manage all your finances in one place
-            </p>
-            
-            <form onSubmit={handleAuthSubmit} className="w-full space-y-4">
-              {/* 成功訊息 */}
-              {successMessage && (
-                <div className="rounded-xl bg-green-500/10 border border-green-500/30 px-4 py-3 text-xs text-green-400">
-                  {successMessage}
-                </div>
-              )}
+          <Card className="border-white/10 bg-gradient-to-br from-[#1A1A24]/80 to-[#0B0B0F]/90 backdrop-blur-xl">
+            <CardHeader className="text-center space-y-2">
+              <CardTitle className="text-4xl tracking-tight">Kura Finance</CardTitle>
+              <CardDescription>Manage all your finances in one place</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleAuthSubmit} className="w-full space-y-4">
+                {successMessage && (
+                  <Alert variant="success">
+                    <AlertDescription>{successMessage}</AlertDescription>
+                  </Alert>
+                )}
 
-              {/* 模式切換 */}
-              {authMode !== 'forgot_password' && (
-                <div className="flex items-center gap-2 text-xs bg-[#1A1A24] p-1 rounded-xl mb-6">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode('login');
-                      setAuthError(null);
-                      setSuccessMessage(null);
-                      setRegistrationStep('request');
-                      setRegistrationCode('');
-                    }}
-                    className={`flex-1 px-3 py-2 rounded-lg border transition-all ${
-                      authMode === 'login'
-                        ? 'bg-[#8B5CF6]/20 border-[#8B5CF6]/50 text-[#C4B5FD]'
-                        : 'border-transparent text-gray-400 hover:text-gray-300'
-                    }`}
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode('register');
-                      setAuthError(null);
-                      setSuccessMessage(null);
-                      setRegistrationStep('request');
-                      setRegistrationCode('');
-                    }}
-                    className={`flex-1 px-3 py-2 rounded-lg border transition-all ${
-                      authMode === 'register'
-                        ? 'bg-[#8B5CF6]/20 border-[#8B5CF6]/50 text-[#C4B5FD]'
-                        : 'border-transparent text-gray-400 hover:text-gray-300'
-                    }`}
-                  >
-                    Sign Up
-                  </button>
-                </div>
-              )}
+                {authMode !== 'forgot_password' && (
+                  <div className="grid grid-cols-2 gap-2 rounded-lg bg-[#0F0F16] p-1">
+                    <Button
+                      type="button"
+                      onClick={resetToLogin}
+                      variant={authMode === 'login' ? 'default' : 'ghost'}
+                      className={cn('h-9', authMode !== 'login' && 'text-gray-400')}
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('register');
+                        setAuthError(null);
+                        setSuccessMessage(null);
+                        setRegistrationStep('request');
+                        setRegistrationCode('');
+                      }}
+                      variant={authMode === 'register' ? 'default' : 'ghost'}
+                      className={cn('h-9', authMode !== 'register' && 'text-gray-400')}
+                    >
+                      Sign Up
+                    </Button>
+                  </div>
+                )}
 
-              {/* 忘記密碼標題 */}
-              {authMode === 'forgot_password' && (
-                <div className="text-left mb-6">
-                  <h2 className="text-lg font-semibold text-white mb-1">Reset Password</h2>
-                  <p className="text-xs text-gray-400">
-                    {resetStep === 'request'
-                      ? 'Enter your email to receive a verification code.'
-                      : 'Enter the verification code and your new password.'}
-                  </p>
-                </div>
-              )}
+                {authMode === 'forgot_password' && (
+                  <div className="text-left mb-6">
+                    <h2 className="text-lg font-semibold text-white mb-1">Reset Password</h2>
+                    <p className="text-xs text-gray-400">
+                      {resetStep === 'request'
+                        ? 'Enter your email to receive a verification code.'
+                        : 'Enter the verification code and your new password.'}
+                    </p>
+                  </div>
+                )}
 
-              {/* 電子郵件輸入 */}
-              <input
-                type="email"
-                name="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={authMode === 'forgot_password' && resetStep === 'verify'}
-                placeholder="Email"
-                className="w-full rounded-xl bg-[#0B0B0F] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#8B5CF6]/60 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              />
+                <Input
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={authMode === 'forgot_password' && resetStep === 'verify'}
+                  placeholder="Email"
+                />
 
-              {/* 驗證步驟輸入欄位 */}
-              {authMode === 'forgot_password' && resetStep === 'verify' && (
-                <>
-                  <input
-                    type="text"
-                    value={resetCode}
-                    onChange={(e) => setResetCode(e.target.value)}
-                    placeholder="6-digit Verification Code"
-                    className="w-full rounded-xl bg-[#0B0B0F] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#8B5CF6]/60 transition-colors"
-                  />
-                  <input
+                {authMode === 'forgot_password' && resetStep === 'verify' && (
+                  <>
+                    <Input
+                      type="text"
+                      value={resetCode}
+                      onChange={(e) => setResetCode(e.target.value)}
+                      placeholder="6-digit Verification Code"
+                    />
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="New Password"
+                    />
+                  </>
+                )}
+
+                {authMode !== 'forgot_password' && (
+                  <Input
                     type="password"
+                    name={authMode === 'register' ? 'new-password' : 'current-password'}
+                    autoComplete={authMode === 'register' ? 'new-password' : 'current-password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="New Password"
-                    className="w-full rounded-xl bg-[#0B0B0F] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#8B5CF6]/60 transition-colors"
+                    placeholder="Password"
                   />
-                </>
-              )}
+                )}
 
-              {/* 密碼輸入（登入 / 註冊） */}
-              {authMode !== 'forgot_password' && (
-                <input
-                  type="password"
-                  name={authMode === 'register' ? 'new-password' : 'current-password'}
-                  autoComplete={authMode === 'register' ? 'new-password' : 'current-password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  className="w-full rounded-xl bg-[#0B0B0F] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#8B5CF6]/60 transition-colors"
-                />
-              )}
+                {authMode === 'register' && registrationStep === 'verify' && (
+                  <Input
+                    type="text"
+                    value={registrationCode}
+                    onChange={(e) => setRegistrationCode(e.target.value)}
+                    placeholder="6-digit Verification Code"
+                  />
+                )}
 
-              {/* 註冊驗證步驟輸入 */}
-              {authMode === 'register' && registrationStep === 'verify' && (
-                <input
-                  type="text"
-                  value={registrationCode}
-                  onChange={(e) => setRegistrationCode(e.target.value)}
-                  placeholder="6-digit Verification Code"
-                  className="w-full rounded-xl bg-[#0B0B0F] border border-white/10 px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#8B5CF6]/60 transition-colors"
-                />
-              )}
+                {authMode === 'login' && (
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('forgot_password');
+                        setAuthError(null);
+                        setSuccessMessage(null);
+                        setResetStep('request');
+                      }}
+                      variant="ghost"
+                      size="sm"
+                      className="text-[#A78BFA] hover:text-[#C4B5FD]"
+                    >
+                      Forgot Password?
+                    </Button>
+                  </div>
+                )}
 
-              {/* 忘記密碼連結 */}
-              {authMode === 'login' && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode('forgot_password');
-                      setAuthError(null);
-                      setSuccessMessage(null);
-                      setResetStep('request');
-                    }}
-                    className="text-xs text-[#8B5CF6] hover:text-[#A78BFA] transition-colors"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-              )}
+                {authError && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{authError}</AlertDescription>
+                  </Alert>
+                )}
 
-              {/* 錯誤訊息 */}
-              {authError && (
-                <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-xs text-red-400">
-                  {authError}
-                </div>
-              )}
+                <Button type="submit" disabled={isAuthenticating} className="w-full shadow-[0_0_20px_rgba(139,92,246,0.25)]">
+                  {isAuthenticating
+                    ? 'Processing...'
+                    : authMode === 'forgot_password'
+                      ? resetStep === 'request'
+                        ? 'Send Code'
+                        : 'Reset Password'
+                      : authMode === 'register'
+                        ? registrationStep === 'request'
+                          ? 'Send Verification Code'
+                          : 'Create Account'
+                        : 'Sign In'}
+                </Button>
 
-              {/* 送出按鈕 */}
-              <button
-                type="submit"
-                disabled={isAuthenticating}
-                className="w-full py-3 mt-2 rounded-xl bg-[#8B5CF6] text-white text-sm font-semibold hover:bg-[#A78BFA] disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-[0_0_20px_rgba(139,92,246,0.3)]"
-              >
-                {isAuthenticating
-                  ? 'Processing...'
-                  : authMode === 'forgot_password'
-                  ? resetStep === 'request'
-                    ? 'Send Code'
-                    : 'Reset Password'
-                  : authMode === 'register'
-                  ? registrationStep === 'request'
-                    ? 'Send Verification Code'
-                    : 'Create Account'
-                  : 'Sign In'}
-              </button>
-
-              {/* 返回登入連結 */}
-              {authMode === 'forgot_password' && (
-                <div className="mt-4 text-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode('login');
-                      setAuthError(null);
-                      setSuccessMessage(null);
-                      setResetStep('request');
-                      setResetCode('');
-                    }}
-                    className="text-xs text-gray-400 hover:text-white transition-colors"
-                  >
-                    Back to Sign In
-                  </button>
-                </div>
-              )}
-            </form>
-          </div>
+                {authMode === 'forgot_password' && (
+                  <div className="mt-4 text-center">
+                    <Button type="button" onClick={resetToLogin} variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                      Back to Sign In
+                    </Button>
+                  </div>
+                )}
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );

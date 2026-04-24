@@ -1,23 +1,26 @@
-// dashboard 首頁
 "use client";
 
 import React, { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { useFinanceStore } from '../store/useFinanceStore';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useFinanceStore } from '../store/useFinanceStore';
 
 const ConnectAccountModal = dynamic(() => import('@/components/ConnectAccountModal'), {
   ssr: false,
 });
 
 export default function DashboardPage() {
-  const accounts = useFinanceStore(state => state.accounts);
-  const transactions = useFinanceStore(state => state.transactions);
-  const apiAssetHistory = useFinanceStore(state => state.apiAssetHistory);
-  const assetHistorySummary = useFinanceStore(state => state.assetHistorySummary);
-  const isLoadingAssetHistory = useFinanceStore(state => state.isLoadingAssetHistory);
-  const hydrateAssetHistory = useFinanceStore(state => state.hydrateAssetHistory);
+  const accounts = useFinanceStore((state) => state.accounts);
+  const transactions = useFinanceStore((state) => state.transactions);
+  const apiAssetHistory = useFinanceStore((state) => state.apiAssetHistory);
+  const assetHistorySummary = useFinanceStore((state) => state.assetHistorySummary);
+  const isLoadingAssetHistory = useFinanceStore((state) => state.isLoadingAssetHistory);
+  const hydrateAssetHistory = useFinanceStore((state) => state.hydrateAssetHistory);
 
   const [isConnectModalOpen, setIsConnectModalOpen] = useState<boolean>(false);
 
@@ -31,21 +34,18 @@ export default function DashboardPage() {
     }, 0);
   }, [accounts]);
 
-  // 取得最近交易（最近 5 筆）
   const recentTransactions = useMemo(() => {
     return [...transactions]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 5);
   }, [transactions]);
 
-  // 元件掛載時從 API 取得資產歷史
   useEffect(() => {
     hydrateAssetHistory(30);
   }, [hydrateAssetHistory]);
 
-  // 將 API 資產歷史轉為圖表格式
   const chartData = useMemo(() => {
-    return apiAssetHistory.map(point => ({
+    return apiAssetHistory.map((point) => ({
       time: new Date(point.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       value: point.value,
     }));
@@ -55,84 +55,64 @@ export default function DashboardPage() {
   const changePositive = changePercent !== null && changePercent >= 0;
 
   return (
-    <div className="w-full pb-24 px-12 sm:px-[72px] lg:px-24 pt-24 max-w-7xl mx-auto">
+    <div className="w-full pb-24 px-6 sm:px-10 lg:px-16 pt-24 max-w-7xl mx-auto">
       {isConnectModalOpen && (
-        <ConnectAccountModal
-          isOpen={isConnectModalOpen}
-          onClose={() => setIsConnectModalOpen(false)}
-        />
+        <ConnectAccountModal isOpen={isConnectModalOpen} onClose={() => setIsConnectModalOpen(false)} />
       )}
 
-      {/* 上半區塊：總資產與帳戶 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-4 lg:mb-6 w-full">
-        
-        {/* 總資產卡片 */}
-        <div className="rounded-2xl bg-[#1A1A24] border border-white/5 p-3 sm:p-4 lg:p-5 flex flex-col justify-between h-[40vh] min-h-[267px] max-h-[453px] w-full">
-          <div>
-            <p className="text-gray-400 text-[11px] sm:text-xs lg:text-sm font-medium mb-1.5 sm:mb-2">Total Assets</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6 w-full">
+        <Card className="h-[40vh] min-h-[267px] max-h-[453px]">
+          <CardHeader className="pb-3">
+            <CardDescription className="text-sm">Total Assets</CardDescription>
             <div className="flex items-baseline gap-3 flex-wrap">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white">${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h2>
+              <CardTitle className="text-2xl md:text-3xl xl:text-4xl">
+                ${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </CardTitle>
               {changePercent !== null && (
-                <span className={`text-xs sm:text-sm font-semibold px-2 py-0.5 rounded-full ${
-                  changePositive
-                    ? 'bg-emerald-500/15 text-emerald-400'
-                    : 'bg-red-500/15 text-red-400'
-                }`}>
-                  {changePositive ? '+' : ''}{changePercent.toFixed(2)}% <span className="font-normal opacity-70">30d</span>
-                </span>
+                <Badge variant={changePositive ? 'success' : 'destructive'}>
+                  {changePositive ? '+' : ''}
+                  {changePercent.toFixed(2)}% <span className="ml-1 opacity-70">30d</span>
+                </Badge>
               )}
             </div>
-          </div>
-          
-          {/* 圖表 */}
-          {isLoadingAssetHistory ? (
-            <div className="flex-1 flex items-end mt-1.5 sm:mt-2 min-h-[80px]">
+          </CardHeader>
+          <CardContent className="h-[calc(100%-100px)]">
+            {isLoadingAssetHistory ? (
               <div className="w-full h-full rounded-xl bg-white/5 animate-pulse" />
-            </div>
-          ) : chartData.length > 0 ? (
-            <div className="flex-1 -mx-3 sm:-mx-4 lg:-mx-5 -mb-3 sm:-mb-4 lg:-mb-5 flex items-end mt-1.5 sm:mt-2 min-h-[120px]">
+            ) : chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="time" stroke="rgba(255,255,255,0.3)" style={{ fontSize: 'clamp(10px, 2vw, 12px)' }} tick={{ fontSize: 'clamp(10px, 2vw, 12px)' }} />
-                  <YAxis stroke="rgba(255,255,255,0.3)" style={{ fontSize: 'clamp(10px, 2vw, 12px)' }} width={40} tick={{ fontSize: 'clamp(10px, 2vw, 12px)' }} />
-                  <Tooltip 
+                  <XAxis dataKey="time" stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 12 }} />
+                  <YAxis stroke="rgba(255,255,255,0.3)" width={40} tick={{ fontSize: 12 }} />
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#0B0B0F', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                    formatter={(value) => [`$${(value as number).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, '總資產']}
+                    formatter={(value) => [`$${(value as number).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Total Assets']}
                     labelStyle={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px' }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="value" 
-                    stroke="#8B5CF6" 
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 4, fill: '#8B5CF6', strokeWidth: 0 }}
-                  />
+                  <Line type="monotone" dataKey="value" stroke="#8B5CF6" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: '#8B5CF6', strokeWidth: 0 }} />
                 </LineChart>
               </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="space-y-2 sm:space-y-3 mt-auto">
-              <div className="flex justify-between text-xs sm:text-sm lg:text-base">
-                <span className="text-gray-500">Total Accounts</span>
-                <span className="text-white font-medium">{accounts.length}</span>
+            ) : (
+              <div className="flex h-full flex-col justify-end gap-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Total Accounts</span>
+                  <span className="font-medium">{accounts.length}</span>
+                </div>
+                <Button onClick={openConnectFlow} className="w-full">
+                  Connect Account
+                </Button>
               </div>
-              <button
-                onClick={openConnectFlow}
-                className="w-full py-2 sm:py-2.5 rounded-lg bg-[#8B5CF6] hover:bg-[#8B5CF6]/90 text-white text-xs sm:text-sm font-medium transition-colors"
-              >
-                Connect Account
-              </button>
-            </div>
-          )}
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
-        {/* 帳戶卡片 */}
-        <div className="rounded-2xl bg-[#1A1A24] border border-white/5 p-3 sm:p-4 lg:p-5 flex flex-col justify-between h-[40vh] min-h-[267px] max-h-[453px] overflow-y-auto w-full">
-          <div>
-            <p className="text-gray-400 text-[11px] sm:text-xs lg:text-sm font-medium mb-1.5 sm:mb-2">Accounts</p>
-            <div className="space-y-1 sm:space-y-2">
+        <Card className="h-[40vh] min-h-[267px] max-h-[453px] flex flex-col">
+          <CardHeader className="pb-3">
+            <CardDescription className="text-sm">Accounts</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 overflow-y-auto hide-scrollbar">
+            <div className="space-y-2">
               {accounts.map((account) => {
                 const typeLabel: Record<string, string> = {
                   checking: 'Checking',
@@ -141,14 +121,11 @@ export default function DashboardPage() {
                   crypto: 'Crypto',
                 };
                 const accountTypeLabel = typeLabel[account.type] ?? account.type;
-                const accountDisplayName = account.mask
-                  ? `${accountTypeLabel} ••••${account.mask}`
-                  : accountTypeLabel;
+                const accountDisplayName = account.mask ? `${accountTypeLabel} ••••${account.mask}` : accountTypeLabel;
 
                 return (
-                  <div key={account.id} className="flex justify-between items-center py-2 sm:py-2.5 border-b border-white/5 last:border-0 gap-2">
-                    {/* 帳戶 Logo 或名稱首字 */}
-                    <div className="w-7 sm:w-8 h-7 sm:h-8 flex-shrink-0 rounded-full bg-white flex items-center justify-center overflow-hidden">
+                  <div key={account.id} className="flex justify-between items-center py-2 border-b border-white/5 last:border-0 gap-3">
+                    <div className="w-8 h-8 flex-shrink-0 rounded-full bg-white flex items-center justify-center overflow-hidden">
                       {account.logo ? (
                         <Image
                           src={account.logo}
@@ -160,114 +137,101 @@ export default function DashboardPage() {
                             e.currentTarget.style.display = 'none';
                           }}
                         />
-                      ) : null}
-                      {!account.logo && (
-                        <span className="text-gray-900 text-[10px] sm:text-xs font-bold">
-                          {accountTypeLabel.charAt(0).toUpperCase()}
-                        </span>
+                      ) : (
+                        <span className="text-gray-900 text-xs font-bold">{accountTypeLabel.charAt(0).toUpperCase()}</span>
                       )}
                     </div>
-                    {/* 帳戶類型 + 尾碼與餘額 */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-medium text-xs sm:text-sm truncate">{accountDisplayName}</p>
+                      <p className="font-medium text-sm truncate">{accountDisplayName}</p>
                     </div>
-                    <p className={`font-mono font-medium text-xs sm:text-sm flex-shrink-0 ${account.type === 'credit' ? 'text-red-400' : 'text-green-400'}`}>
+                    <p className={`font-mono font-medium text-sm ${account.type === 'credit' ? 'text-red-400' : 'text-green-400'}`}>
                       ${account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
                 );
               })}
             </div>
-          </div>
-          <div className="mt-2 sm:mt-3 pt-2 border-t border-white/5">
-            <button
-              onClick={openConnectFlow}
-              className="w-full py-1.5 sm:py-2 rounded-lg bg-[#8B5CF6] hover:bg-[#8B5CF6]/90 text-white text-[11px] sm:text-xs font-medium transition-colors"
-            >
+          </CardContent>
+          <div className="px-6 pb-6">
+            <Separator className="mb-3" />
+            <Button onClick={openConnectFlow} className="w-full">
               Connect Account
-            </button>
+            </Button>
           </div>
-        </div>
-
+        </Card>
       </div>
 
-      {/* 下半區塊：投資、加密資產、DeFi 協議 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 w-full">
-        
-        {/* 投資卡片 */}
-        <div className="relative aspect-square w-full">
-          <div className="absolute inset-0 rounded-2xl bg-[#1A1A24] border border-white/5 p-3 sm:p-4 lg:p-5 flex flex-col justify-between">
-            <div>
-              <p className="text-gray-400 text-[11px] sm:text-xs lg:text-sm font-medium mb-1.5 sm:mb-2">Investment</p>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1.5 sm:mb-2">$0.00</h3>
-              <p className="text-gray-500 text-[11px] sm:text-xs">Portfolio growth pending setup</p>
-            </div>
-            <button className="w-full py-1.5 sm:py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-[11px] sm:text-xs font-medium transition-colors">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 w-full">
+        <Card className="aspect-square">
+          <CardHeader>
+            <CardDescription>Investment</CardDescription>
+            <CardTitle className="text-2xl">$0.00</CardTitle>
+            <CardDescription>Portfolio growth pending setup</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <Button variant="secondary" className="w-full">
               View Details
-            </button>
-          </div>
-        </div>
+            </Button>
+          </CardContent>
+        </Card>
 
-        {/* 加密資產卡片 */}
-        <div className="relative aspect-square w-full">
-          <div className="absolute inset-0 rounded-2xl bg-[#1A1A24] border border-white/5 p-3 sm:p-4 lg:p-5 flex flex-col justify-between">
-            <div>
-              <p className="text-gray-400 text-[11px] sm:text-xs lg:text-sm font-medium mb-1.5 sm:mb-2">Crypto</p>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1.5 sm:mb-2">$0.00</h3>
-              <p className="text-gray-500 text-[11px] sm:text-xs">Connect your Web3 wallet</p>
-            </div>
-            <button className="w-full py-1.5 sm:py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-[11px] sm:text-xs font-medium transition-colors">
+        <Card className="aspect-square">
+          <CardHeader>
+            <CardDescription>Crypto</CardDescription>
+            <CardTitle className="text-2xl">$0.00</CardTitle>
+            <CardDescription>Connect your Web3 wallet</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <Button variant="secondary" className="w-full">
               Connect Wallet
-            </button>
-          </div>
-        </div>
+            </Button>
+          </CardContent>
+        </Card>
 
-        {/* DeFi 協議卡片 */}
-        <div className="relative aspect-square w-full">
-          <div className="absolute inset-0 rounded-2xl bg-[#1A1A24] border border-white/5 p-3 sm:p-4 lg:p-5 flex flex-col justify-between">
-            <div>
-              <p className="text-gray-400 text-[11px] sm:text-xs lg:text-sm font-medium mb-1.5 sm:mb-2">DeFi Protocol</p>
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1.5 sm:mb-2">$0.00</h3>
-              <p className="text-gray-500 text-[11px] sm:text-xs">Track your DeFi positions</p>
-            </div>
-            <button className="w-full py-1.5 sm:py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-[11px] sm:text-xs font-medium transition-colors">
+        <Card className="aspect-square">
+          <CardHeader>
+            <CardDescription>DeFi Protocol</CardDescription>
+            <CardTitle className="text-2xl">$0.00</CardTitle>
+            <CardDescription>Track your DeFi positions</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <Button variant="secondary" className="w-full">
               Add Protocol
-            </button>
-          </div>
-        </div>
-
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* 最近交易區塊 */}
-      <div className="w-full">
-        <div className="rounded-2xl bg-[#1A1A24] border border-white/5 p-4 sm:p-5 lg:p-6 w-full">
-          <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white mb-3 sm:mb-4">Recent Transactions</h3>
-          
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">Recent Transactions</CardTitle>
+        </CardHeader>
+        <CardContent>
           {recentTransactions.length === 0 ? (
-            <p className="text-gray-500 text-xs sm:text-sm text-center py-8">No transactions yet</p>
+            <p className="text-gray-500 text-sm text-center py-8">No transactions yet</p>
           ) : (
             <div className="space-y-0">
               {recentTransactions.map((transaction, index) => (
-                <div key={transaction.id} className={`flex justify-between items-center py-2 sm:py-3 ${index !== recentTransactions.length - 1 ? 'border-b border-white/5' : ''}`}>
+                <div key={transaction.id} className={`flex justify-between items-center py-3 ${index !== recentTransactions.length - 1 ? 'border-b border-white/5' : ''}`}>
                   <div className="flex-1">
-                    <p className="text-white font-medium text-xs sm:text-sm">{transaction.merchant}</p>
-                    <div className="flex gap-2 sm:gap-3 mt-1">
+                    <p className="font-medium text-sm">{transaction.merchant}</p>
+                    <div className="flex gap-3 mt-1">
                       <p className="text-gray-500 text-xs">{transaction.category}</p>
                       <p className="text-gray-500 text-xs">{new Date(transaction.date).toLocaleDateString('en-US')}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`font-mono font-medium text-xs sm:text-sm ${transaction.type === 'credit' ? 'text-red-400' : 'text-green-400'}`}>
+                    <p className={`font-mono font-medium text-sm ${transaction.type === 'credit' ? 'text-red-400' : 'text-green-400'}`}>
                       {transaction.type === 'credit' ? '-' : '+'} ${transaction.amount}
                     </p>
-                    <p className="text-gray-500 text-xs sm:text-sm mt-1">{transaction.accountName}</p>
+                    <p className="text-gray-500 text-xs mt-1">{transaction.accountName}</p>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
