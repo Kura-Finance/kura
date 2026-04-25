@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/useAppStore';
+import logoIcon from './logo.webp';
+import referPreview from './refer.webp';
 
 export default function RootHubPage() {
   const authStatus = useAppStore((state) => state.authStatus);
@@ -150,109 +151,115 @@ export default function RootHubPage() {
   }
 
   if (authStatus === 'unauthenticated') {
+    const isRegister = authMode === 'register';
+    const isForgotPassword = authMode === 'forgot_password';
+
     return (
-      <div className="flex-1 flex justify-center items-center p-6 md:p-10">
-        <div className="w-full max-w-md">
-          <Card className="border-white/10 bg-gradient-to-br from-[#1A1A24]/80 to-[#0B0B0F]/90 backdrop-blur-xl">
-            <CardHeader className="text-center space-y-2">
-              <CardTitle className="text-4xl tracking-tight">Kura Finance</CardTitle>
-              <CardDescription>Manage all your finances in one place</CardDescription>
-            </CardHeader>
-            <CardContent>
+      <div className="min-h-screen w-full bg-[#F1F0F6] text-[#1F2937] px-6 py-6 md:px-8 flex flex-col">
+        <header className="w-full flex items-center justify-between">
+          <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center">
+            <Image src={logoIcon} alt="Kura icon" width={28} height={28} className="object-cover" />
+          </div>
+          <a
+            href="https://kura-finance.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-[#4B5563] hover:text-[#111827] transition-colors inline-flex items-center gap-1 px-4 h-9 rounded-full border border-[#D7D7E2] bg-[#F8F8FC] hover:bg-white"          >
+            Official Website
+          </a>
+        </header>
+
+        <div className="flex-1 flex justify-center items-center">
+          <div className="w-full max-w-[760px] rounded-xl border border-[#DDDDE8] bg-[#F7F7FA] overflow-hidden grid grid-cols-1 md:grid-cols-2">
+            <section className="bg-[#F6F6F7] p-7 md:p-8 border-b md:border-b-0 md:border-r border-[#DDDDE8]">
+              <h1 className="text-[30px] leading-none font-semibold tracking-tight mb-6">
+                {isForgotPassword ? 'Reset password' : isRegister ? 'Sign up' : 'Log in'}
+              </h1>
+
               <form onSubmit={handleAuthSubmit} className="w-full space-y-4">
                 {successMessage && (
-                  <Alert variant="success">
+                  <Alert variant="success" className="border-emerald-200 bg-emerald-50 text-emerald-700">
                     <AlertDescription>{successMessage}</AlertDescription>
                   </Alert>
                 )}
 
-                {authMode !== 'forgot_password' && (
-                  <div className="grid grid-cols-2 gap-2 rounded-lg bg-[#0F0F16] p-1">
-                    <Button
-                      type="button"
-                      onClick={resetToLogin}
-                      variant={authMode === 'login' ? 'default' : 'ghost'}
-                      className={cn('h-9', authMode !== 'login' && 'text-gray-400')}
-                    >
-                      Sign In
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        setAuthMode('register');
-                        setAuthError(null);
-                        setSuccessMessage(null);
-                        setRegistrationStep('request');
-                        setRegistrationCode('');
-                      }}
-                      variant={authMode === 'register' ? 'default' : 'ghost'}
-                      className={cn('h-9', authMode !== 'register' && 'text-gray-400')}
-                    >
-                      Sign Up
-                    </Button>
-                  </div>
+                {isForgotPassword && (
+                  <p className="text-xs text-[#6B7280]">
+                    {resetStep === 'request'
+                      ? 'Enter your email to receive a verification code.'
+                      : 'Enter the verification code and your new password.'}
+                  </p>
                 )}
 
-                {authMode === 'forgot_password' && (
-                  <div className="text-left mb-6">
-                    <h2 className="text-lg font-semibold text-white mb-1">Reset Password</h2>
-                    <p className="text-xs text-gray-400">
-                      {resetStep === 'request'
-                        ? 'Enter your email to receive a verification code.'
-                        : 'Enter the verification code and your new password.'}
-                    </p>
-                  </div>
-                )}
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-[#6B7280]">Email</label>
+                  <Input
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isForgotPassword && resetStep === 'verify'}
+                    placeholder="you@example.com"
+                    className="h-11 border-[#DADCE5] bg-white text-[#111827] placeholder:text-[#9CA3AF] focus-visible:border-[#A8B0FF]"
+                  />
+                </div>
 
-                <Input
-                  type="email"
-                  name="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={authMode === 'forgot_password' && resetStep === 'verify'}
-                  placeholder="Email"
-                />
-
-                {authMode === 'forgot_password' && resetStep === 'verify' && (
+                {isForgotPassword && resetStep === 'verify' && (
                   <>
-                    <Input
-                      type="text"
-                      value={resetCode}
-                      onChange={(e) => setResetCode(e.target.value)}
-                      placeholder="6-digit Verification Code"
-                    />
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="New Password"
-                    />
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-[#6B7280]">Verification code</label>
+                      <Input
+                        type="text"
+                        value={resetCode}
+                        onChange={(e) => setResetCode(e.target.value)}
+                        placeholder="6-digit verification code"
+                        className="h-11 border-[#DADCE5] bg-white text-[#111827] placeholder:text-[#9CA3AF] focus-visible:border-[#A8B0FF]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-[#6B7280]">New password</label>
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Create a new password"
+                        className="h-11 border-[#DADCE5] bg-white text-[#111827] placeholder:text-[#9CA3AF] focus-visible:border-[#A8B0FF]"
+                      />
+                    </div>
                   </>
                 )}
 
-                {authMode !== 'forgot_password' && (
-                  <Input
-                    type="password"
-                    name={authMode === 'register' ? 'new-password' : 'current-password'}
-                    autoComplete={authMode === 'register' ? 'new-password' : 'current-password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                  />
+                {!isForgotPassword && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-[#6B7280]">Password</label>
+                    <Input
+                      type="password"
+                      name={isRegister ? 'new-password' : 'current-password'}
+                      autoComplete={isRegister ? 'new-password' : 'current-password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder={isRegister ? 'Create password' : 'Enter password'}
+                      className="h-11 border-[#DADCE5] bg-white text-[#111827] placeholder:text-[#9CA3AF] focus-visible:border-[#A8B0FF]"
+                    />
+                  </div>
                 )}
 
-                {authMode === 'register' && registrationStep === 'verify' && (
-                  <Input
-                    type="text"
-                    value={registrationCode}
-                    onChange={(e) => setRegistrationCode(e.target.value)}
-                    placeholder="6-digit Verification Code"
-                  />
+                {isRegister && registrationStep === 'verify' && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-[#6B7280]">Verification code</label>
+                    <Input
+                      type="text"
+                      value={registrationCode}
+                      onChange={(e) => setRegistrationCode(e.target.value)}
+                      placeholder="6-digit verification code"
+                      className="h-11 border-[#DADCE5] bg-white text-[#111827] placeholder:text-[#9CA3AF] focus-visible:border-[#A8B0FF]"
+                    />
+                  </div>
                 )}
 
-                {authMode === 'login' && (
-                  <div className="flex justify-end">
+                <div className="min-h-6 flex items-center">
+                  {!isForgotPassword && authMode === 'login' ? (
                     <Button
                       type="button"
                       onClick={() => {
@@ -263,43 +270,80 @@ export default function RootHubPage() {
                       }}
                       variant="ghost"
                       size="sm"
-                      className="text-[#A78BFA] hover:text-[#C4B5FD]"
+                      className="h-auto p-0 text-xs text-[#6B7280] hover:text-[#374151] hover:bg-transparent"
                     >
-                      Forgot Password?
+                      Forgot password?
                     </Button>
-                  </div>
-                )}
+                  ) : (
+                    <span className="text-xs text-transparent select-none">Forgot password?</span>
+                  )}
+                </div>
 
                 {authError && (
-                  <Alert variant="destructive">
+                  <Alert variant="destructive" className="border-red-200 bg-red-50 text-red-700">
                     <AlertDescription>{authError}</AlertDescription>
                   </Alert>
                 )}
 
-                <Button type="submit" disabled={isAuthenticating} className="w-full shadow-[0_0_20px_rgba(139,92,246,0.25)]">
-                  {isAuthenticating
-                    ? 'Processing...'
-                    : authMode === 'forgot_password'
-                      ? resetStep === 'request'
-                        ? 'Send Code'
-                        : 'Reset Password'
-                      : authMode === 'register'
-                        ? registrationStep === 'request'
-                          ? 'Send Verification Code'
-                          : 'Create Account'
-                        : 'Sign In'}
-                </Button>
+                <div className="border-t border-[#E4E5EC] pt-4 space-y-3">
+                  <Button
+                    type="submit"
+                    disabled={isAuthenticating}
+                    className="w-full h-11 rounded-xl bg-[#B8BEFF] text-white hover:bg-[#A8B0FF] shadow-none"
+                  >
+                    {isAuthenticating
+                      ? 'Processing...'
+                      : isForgotPassword
+                        ? resetStep === 'request'
+                          ? 'Send code'
+                          : 'Reset password'
+                        : isRegister
+                          ? registrationStep === 'request'
+                            ? 'Send verification code'
+                            : 'Create account'
+                          : 'Log in'}
+                  </Button>
 
-                {authMode === 'forgot_password' && (
-                  <div className="mt-4 text-center">
-                    <Button type="button" onClick={resetToLogin} variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                      Back to Sign In
+                  {isForgotPassword ? (
+                    <Button
+                      type="button"
+                      onClick={resetToLogin}
+                      variant="ghost"
+                      className="w-full h-10 rounded-xl border border-[#DADCE5] bg-white text-[#4B5563] hover:bg-[#F3F4F6]"
+                    >
+                      Back to log in
                     </Button>
-                  </div>
-                )}
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode(isRegister ? 'login' : 'register');
+                        setAuthError(null);
+                        setSuccessMessage(null);
+                        setRegistrationStep('request');
+                        setRegistrationCode('');
+                      }}
+                      variant="ghost"
+                      className="w-full h-10 rounded-xl border border-[#DADCE5] bg-white text-[#4B5563] hover:bg-[#F3F4F6]"
+                    >
+                      {isRegister ? 'Switch to log in' : 'Switch to sign up'}
+                    </Button>
+                  )}
+                </div>
               </form>
-            </CardContent>
-          </Card>
+            </section>
+
+            <aside className="p-7 md:p-8 bg-[#F3F3F8]">
+              <h2 className="text-xl font-semibold mb-2">Refer Friends. Earn 10% Lifetime. Protect More Privacy.</h2>
+              <p className="text-sm text-[#6B7280] leading-relaxed mb-4">
+                Invite your friends to Kura Finance and earn 10% lifetime commission every time they subscribe to Pro or Ultimate — while they get a full month of Pro for free.
+              </p>
+
+              <div className="rounded-xl border border-[#DADCE5] bg-white overflow-hidden h-44 relative">
+                <Image src={referPreview} alt="Refer preview" fill className="object-cover" />
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     );
