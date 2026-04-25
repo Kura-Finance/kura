@@ -150,16 +150,27 @@ export default function ProfilePage() {
           </Button>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-[var(--kura-border)]">
-          <Button
-            onClick={handleDeleteAccount}
-            variant="destructive"
-            disabled={isDeletingAccount}
-            className="w-full sm:w-auto"
-          >
-            {isDeletingAccount ? 'Deleting Account...' : 'Delete Account'}
-          </Button>
-        </div>
+        <Card className="mt-8 border-red-500/30 bg-red-500/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-red-300">Danger Zone</CardTitle>
+            <CardDescription className="text-red-200/80">
+              Permanently delete your account and all related data. This action cannot be undone.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <p className="text-sm text-red-200/80">
+              Make sure you have exported any data you need before continuing.
+            </p>
+            <Button
+              onClick={handleDeleteAccount}
+              variant="destructive"
+              disabled={isDeletingAccount}
+              className="w-full sm:w-auto"
+            >
+              {isDeletingAccount ? 'Deleting Account...' : 'Delete Account'}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
