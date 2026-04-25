@@ -122,14 +122,6 @@ export default function AccountsPage() {
         )}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setIsConnectModalOpen(true)}
-        className="mt-4 inline-flex items-center gap-2 text-sm text-[var(--kura-text-secondary)] hover:text-[var(--kura-text)] transition-colors"
-      >
-        <span className="w-6 h-6 rounded-full border border-[var(--kura-border)] inline-flex items-center justify-center">+</span>
-        Create account
-      </button>
     </div>
   );
 }
