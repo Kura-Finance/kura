@@ -35,33 +35,18 @@ export default function AccountsPage() {
     }, 0);
   }, [accounts]);
 
-  const fundingAccount = useMemo(() => {
-    return accounts.find((account) => account.type === 'checking') ?? accounts.find((account) => account.type === 'saving');
-  }, [accounts]);
-
   const rows = useMemo(() => {
     return accounts.map((account) => {
       const balanceText = account.type === 'credit' ? `-${formatCurrency(account.balance)}` : formatCurrency(account.balance);
       const maskedBalance = isBalanceHidden ? '••••••' : balanceText;
 
-      const autoTransferRule =
-        account.type === 'credit'
-          ? fundingAccount
-            ? `Autopay from ${getAccountDisplayName(fundingAccount.name, fundingAccount.mask)}`
-            : 'Add checking account'
-          : '+ Create rule';
-
-      const autoTransferSubtext = account.type === 'credit' && fundingAccount ? 'Daily' : '';
-
       return {
         ...account,
         displayName: getAccountDisplayName(account.name, account.mask),
         maskedBalance,
-        autoTransferRule,
-        autoTransferSubtext,
       };
     });
-  }, [accounts, fundingAccount, isBalanceHidden]);
+  }, [accounts, isBalanceHidden]);
 
   return (
     <div className="w-full pb-24 px-6 sm:px-10 lg:px-16 pt-8 max-w-6xl mx-auto">
@@ -74,21 +59,18 @@ export default function AccountsPage() {
           <h1 className="text-3xl font-semibold tracking-tight">Accounts</h1>
           <div className="mt-3 flex items-center gap-5 text-sm text-[var(--kura-text-secondary)]">
             <button type="button" className="pb-2 border-b border-[var(--kura-primary)] text-[var(--kura-text)]">
-              Mercury accounts
+              Bank accounts
             </button>
             <button type="button" className="pb-2 border-b border-transparent hover:text-[var(--kura-text)] transition-colors">
-              Linked accounts
+              Investment accounts
             </button>
             <button type="button" className="pb-2 border-b border-transparent hover:text-[var(--kura-text)] transition-colors">
-              Auto transfer rules
+              Wallet address
             </button>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" className="text-sm">
-            Transfer funds
-          </Button>
           <Button variant="secondary" onClick={() => setIsConnectModalOpen(true)}>
             Add account
           </Button>
@@ -101,10 +83,9 @@ export default function AccountsPage() {
       </div>
 
       <div className="rounded-2xl border border-[var(--kura-border)] bg-[var(--kura-surface)] overflow-hidden">
-        <div className="grid grid-cols-[1.6fr_0.6fr_1fr] gap-4 px-4 py-3 text-xs uppercase tracking-wide text-[var(--kura-text-secondary)] border-b border-[var(--kura-border)]">
+        <div className="grid grid-cols-[1.7fr_0.7fr] gap-4 px-4 py-3 text-xs uppercase tracking-wide text-[var(--kura-text-secondary)] border-b border-[var(--kura-border)]">
           <div>Account</div>
           <div>Balance</div>
-          <div>Auto transfer rules</div>
         </div>
 
         {isLoadingPlaidData ? (
@@ -118,7 +99,7 @@ export default function AccountsPage() {
           </div>
         ) : (
           rows.map((row) => (
-            <div key={row.id} className="grid grid-cols-[1.6fr_0.6fr_1fr] gap-4 px-4 py-3 items-center border-b border-[var(--kura-border-light)] last:border-b-0">
+            <div key={row.id} className="grid grid-cols-[1.7fr_0.7fr] gap-4 px-4 py-3 items-center border-b border-[var(--kura-border-light)] last:border-b-0">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-[var(--kura-bg-lighter)] border border-[var(--kura-border)] overflow-hidden flex items-center justify-center">
                   {row.logo ? (
@@ -136,13 +117,6 @@ export default function AccountsPage() {
               <p className={`text-sm font-mono ${row.type === 'credit' ? 'text-red-400' : 'text-emerald-400'}`}>
                 {row.maskedBalance}
               </p>
-
-              <div className="text-sm">
-                <p className={row.type === 'credit' ? 'text-[var(--kura-text)]' : 'text-[var(--kura-primary)]'}>{row.autoTransferRule}</p>
-                {row.autoTransferSubtext ? (
-                  <p className="text-xs text-[var(--kura-text-secondary)]">{row.autoTransferSubtext}</p>
-                ) : null}
-              </div>
             </div>
           ))
         )}
