@@ -1,17 +1,62 @@
 "use client";
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { useAppStore } from '@/store/useAppStore';
 
+type DatePreset = 'all' | 'thisMonth' | 'last30' | 'custom';
+type AmountDirection = 'any' | 'in' | 'out';
+
 export default function TransactionsPage() {
   const transactions = useFinanceStore((state) => state.transactions);
   const accounts = useFinanceStore((state) => state.accounts);
   const isBalanceHidden = useAppStore((state) => state.isBalanceHidden);
   const [keyword, setKeyword] = useState('');
+  const [openPopover, setOpenPopover] = useState<'date' | 'amount' | null>(null);
+  const [datePreset, setDatePreset] = useState<DatePreset>('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [amountDirection, setAmountDirection] = useState<AmountDirection>('any');
+  const [specificAmount, setSpecificAmount] = useState('');
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const now = new Date();
+    const today = now.toISOString().slice(0, 10);
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+    const last30Start = new Date(now.getTime() - 29 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    if (datePreset === 'all') {
+      setDateFrom('');
+      setDateTo('');
+      return;
+    }
+    if (datePreset === 'thisMonth') {
+      setDateFrom(thisMonthStart);
+      setDateTo(today);
+      return;
+    }
+    if (datePreset === 'last30') {
+      setDateFrom(last30Start);
+      setDateTo(today);
+    }
+  }, [datePreset]);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!toolbarRef.current?.contains(target)) {
+        setOpenPopover(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -25,20 +70,47 @@ export default function TransactionsPage() {
     return Number.isFinite(parsed) ? Math.abs(parsed) : 0;
   };
 
+  const parseFilterNumber = (raw: string): number | null => {
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? Math.abs(parsed) : null;
+  };
+
   const filteredTransactions = useMemo(() => {
     const sorted = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const normalizedKeyword = keyword.trim().toLowerCase();
-
-    if (!normalizedKeyword) return sorted;
+    const exactAmount = parseFilterNumber(specificAmount);
+    const min = parseFilterNumber(minAmount);
+    const max = parseFilterNumber(maxAmount);
+    const fromTs = dateFrom ? new Date(`${dateFrom}T00:00:00`).getTime() : null;
+    const toTs = dateTo ? new Date(`${dateTo}T23:59:59`).getTime() : null;
 
     return sorted.filter((transaction) => {
-      return (
-        transaction.merchant.toLowerCase().includes(normalizedKeyword) ||
-        transaction.category.toLowerCase().includes(normalizedKeyword) ||
-        transaction.accountName.toLowerCase().includes(normalizedKeyword)
-      );
+      const amount = parseAmount(transaction.amount);
+      const txDate = new Date(transaction.date).getTime();
+      const isOut = transaction.type === 'credit';
+      const isIn = !isOut;
+
+      if (normalizedKeyword) {
+        const matchesKeyword =
+          transaction.merchant.toLowerCase().includes(normalizedKeyword) ||
+          transaction.category.toLowerCase().includes(normalizedKeyword) ||
+          transaction.accountName.toLowerCase().includes(normalizedKeyword);
+        if (!matchesKeyword) return false;
+      }
+
+      if (fromTs !== null && txDate < fromTs) return false;
+      if (toTs !== null && txDate > toTs) return false;
+
+      if (amountDirection === 'in' && !isIn) return false;
+      if (amountDirection === 'out' && !isOut) return false;
+
+      if (exactAmount !== null && Math.abs(amount - exactAmount) > 0.0001) return false;
+      if (min !== null && amount < min) return false;
+      if (max !== null && amount > max) return false;
+
+      return true;
     });
-  }, [transactions, keyword]);
+  }, [transactions, keyword, dateFrom, dateTo, specificAmount, minAmount, maxAmount, amountDirection]);
 
   const summary = useMemo(() => {
     const now = new Date();
@@ -98,11 +170,114 @@ export default function TransactionsPage() {
         </Button>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Button variant="secondary" size="sm">Data views</Button>
-        <Button variant="secondary" size="sm">Filters</Button>
-        <Button variant="secondary" size="sm">Date</Button>
-        <Button variant="secondary" size="sm">Amount</Button>
+      <div ref={toolbarRef} className="mb-4 flex flex-wrap items-center gap-2 relative">
+        <div className="relative">
+          <Button variant="secondary" size="sm" onClick={() => setOpenPopover((p) => (p === 'date' ? null : 'date'))}>
+            Date {openPopover === 'date' ? '▴' : '▾'}
+          </Button>
+          {openPopover === 'date' && (
+            <div className="absolute left-0 top-9 z-30 w-[320px] rounded-xl border border-[var(--kura-border)] bg-[var(--kura-surface)] p-4 shadow-lg space-y-3">
+              <p className="text-xs text-[var(--kura-text-secondary)]">Show transactions for</p>
+              <select
+                value={datePreset}
+                onChange={(event) => setDatePreset(event.target.value as DatePreset)}
+                className="w-full h-9 rounded-md border border-[var(--kura-border)] bg-[var(--kura-bg-light)] px-2 text-sm"
+              >
+                <option value="all">All time</option>
+                <option value="thisMonth">This month</option>
+                <option value="last30">Last 30 days</option>
+                <option value="custom">Custom range</option>
+              </select>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <p className="mb-1 text-xs text-[var(--kura-text-secondary)]">From</p>
+                  <Input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(event) => {
+                      setDatePreset('custom');
+                      setDateFrom(event.target.value);
+                    }}
+                    className="h-9 border-[var(--kura-border)] bg-[var(--kura-bg-light)]"
+                  />
+                </div>
+                <div>
+                  <p className="mb-1 text-xs text-[var(--kura-text-secondary)]">To</p>
+                  <Input
+                    type="date"
+                    value={dateTo}
+                    onChange={(event) => {
+                      setDatePreset('custom');
+                      setDateTo(event.target.value);
+                    }}
+                    className="h-9 border-[var(--kura-border)] bg-[var(--kura-bg-light)]"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="relative">
+          <Button variant="secondary" size="sm" onClick={() => setOpenPopover((p) => (p === 'amount' ? null : 'amount'))}>
+            Amount {openPopover === 'amount' ? '▴' : '▾'}
+          </Button>
+          {openPopover === 'amount' && (
+            <div className="absolute left-0 top-9 z-30 w-[320px] rounded-xl border border-[var(--kura-border)] bg-[var(--kura-surface)] p-4 shadow-lg space-y-3">
+              <p className="text-xs text-[var(--kura-text-secondary)]">Direction</p>
+              <div className="space-y-1 text-sm">
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="amount-direction" checked={amountDirection === 'any'} onChange={() => setAmountDirection('any')} />
+                  Any
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="amount-direction" checked={amountDirection === 'in'} onChange={() => setAmountDirection('in')} />
+                  In (deposits, refunds)
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="amount-direction" checked={amountDirection === 'out'} onChange={() => setAmountDirection('out')} />
+                  Out (purchases, charges)
+                </label>
+              </div>
+              <div>
+                <p className="mb-1 text-xs text-[var(--kura-text-secondary)]">Specific amount</p>
+                <Input
+                  type="number"
+                  inputMode="decimal"
+                  value={specificAmount}
+                  onChange={(event) => setSpecificAmount(event.target.value)}
+                  placeholder="e.g. 19.99"
+                  className="h-9 border-[var(--kura-border)] bg-[var(--kura-bg-light)]"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <p className="mb-1 text-xs text-[var(--kura-text-secondary)]">At least</p>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    value={minAmount}
+                    onChange={(event) => setMinAmount(event.target.value)}
+                    placeholder="0.00"
+                    className="h-9 border-[var(--kura-border)] bg-[var(--kura-bg-light)]"
+                  />
+                </div>
+                <div>
+                  <p className="mb-1 text-xs text-[var(--kura-text-secondary)]">No more than</p>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    value={maxAmount}
+                    onChange={(event) => setMaxAmount(event.target.value)}
+                    placeholder="0.00"
+                    className="h-9 border-[var(--kura-border)] bg-[var(--kura-bg-light)]"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         <Input
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}

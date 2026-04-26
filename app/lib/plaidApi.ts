@@ -139,3 +139,18 @@ export const disconnectPlaidAccount = (
     }
   );
 };
+
+/**
+ * 中斷 Plaid Item 連線（新版 endpoint）
+ */
+export const disconnectPlaidItem = (
+  accountId: string
+): Promise<{ message: string; data?: { accountId?: string; itemId?: string; institution?: string; plaidRequestId?: string } }> => {
+  return plaidRequest<{ message: string; data?: { accountId?: string; itemId?: string; institution?: string; plaidRequestId?: string } }>(
+    '/api/plaid/disconnect-item',
+    {
+      method: 'POST',
+      body: JSON.stringify({ accountId }),
+    }
+  );
+};

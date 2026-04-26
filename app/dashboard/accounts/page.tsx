@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useFinanceStore } from '@/store/useFinanceStore';
 import { useAppStore } from '@/store/useAppStore';
+import { PlaidApiError, disconnectPlaidItem } from '@/lib/plaidApi';
 
 const ConnectAccountModal = dynamic(() => import('@/components/ConnectAccountModal'), {
   ssr: false,
@@ -42,8 +43,8 @@ export default function AccountsPage() {
   const investmentAccounts = useFinanceStore((state) => state.investmentAccounts);
   const investments = useFinanceStore((state) => state.investments);
   const isLoadingPlaidData = useFinanceStore((state) => state.isLoadingPlaidData);
-  const disconnectBankingAccount = useFinanceStore((state) => state.disconnectBankingAccount);
   const disconnectInvestmentAccount = useFinanceStore((state) => state.disconnectInvestmentAccount);
+  const hydratePlaidFinanceData = useFinanceStore((state) => state.hydratePlaidFinanceData);
   const isBalanceHidden = useAppStore((state) => state.isBalanceHidden);
 
   useEffect(() => {
@@ -179,15 +180,26 @@ export default function AccountsPage() {
     setOpenMenuAccountId(null);
   };
 
-  const handleUnlink = async (accountId: string, unlinkTarget: 'bank' | 'investment') => {
+  const handleUnlink = async (
+    accountId: string,
+    unlinkTarget: 'bank' | 'investment',
+    accountType: string,
+  ) => {
     setOpenMenuAccountId(null);
     setUnlinkingAccountId(accountId);
     try {
-      if (unlinkTarget === 'bank') {
-        await disconnectBankingAccount(accountId);
+      const shouldUsePlaidDisconnect =
+        unlinkTarget === 'bank' || accountType === 'Broker';
+
+      if (shouldUsePlaidDisconnect) {
+        await disconnectPlaidItem(accountId);
+        await hydratePlaidFinanceData();
       } else {
         disconnectInvestmentAccount(accountId);
       }
+    } catch (error) {
+      const message = error instanceof PlaidApiError ? error.message : 'Failed to unlink account.';
+      alert(message);
     } finally {
       setUnlinkingAccountId(null);
     }
@@ -318,7 +330,7 @@ export default function AccountsPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => void handleUnlink(row.id, row.unlinkTarget)}
+                      onClick={() => void handleUnlink(row.id, row.unlinkTarget, row.typeLabel)}
                       className="w-full text-left px-3 py-2 text-sm rounded-lg text-[var(--kura-error)] hover:bg-[var(--kura-border-light)] transition-colors"
                     >
                       Unlink
