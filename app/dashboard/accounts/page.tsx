@@ -19,6 +19,19 @@ function getAccountDisplayName(name: string, mask?: string): string {
   return mask ? `${name} ••${mask}` : name;
 }
 
+function parseBankAccountName(rawName: string, mask?: string): { institutionName: string; accountLabel: string } {
+  const [institutionPart, accountPart] = rawName.split('·').map((part) => part.trim());
+  const institutionName = institutionPart || rawName;
+
+  let accountLabel = accountPart || institutionName;
+  if (mask) {
+    const escapedMask = mask.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    accountLabel = accountLabel.replace(new RegExp(`\\s*${escapedMask}$`), '').trim();
+  }
+
+  return { institutionName, accountLabel };
+}
+
 export default function AccountsPage() {
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<'bank' | 'investment' | 'wallet'>('bank');
@@ -88,15 +101,16 @@ export default function AccountsPage() {
       return accounts.map((account) => {
         const balanceText = account.type === 'credit' ? `-${formatCurrency(account.balance)}` : formatCurrency(account.balance);
         const maskedBalance = isBalanceHidden ? '••••••' : balanceText;
+        const { institutionName, accountLabel } = parseBankAccountName(account.name, account.mask);
         const nickname = nicknameByAccountId[account.id]?.trim();
-        const displayName = getAccountDisplayName(nickname || account.name, account.mask);
+        const displayName = getAccountDisplayName(nickname || accountLabel, account.mask);
 
         return {
           id: account.id,
           logo: account.logo,
           displayName,
           typeLabel: account.type,
-          institutionLabel: account.name,
+          institutionLabel: institutionName,
           maskedBalance,
           balanceTone: account.type === 'credit' ? 'credit' as const : 'positive' as const,
           unlinkTarget: 'bank' as const,
