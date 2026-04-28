@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/store/useAppStore';
 import PlansModal from './_components/PlansModal';
@@ -13,7 +12,6 @@ import {
 } from '@/lib/stripeApi';
 
 export default function PlanBillingPage() {
-  const router = useRouter();
   const membershipLabel = useAppStore((state) => state.userProfile.membershipLabel);
   const currentPlan = membershipLabel || 'Basic';
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false);
@@ -84,14 +82,6 @@ export default function PlanBillingPage() {
   return (
     <div className="w-full pb-10 px-8 pt-10">
       <div className="max-w-6xl mx-auto">
-        <Button
-          onClick={() => router.back()}
-          variant="ghost"
-          className="mb-4 px-0 text-[var(--kura-text-secondary)] hover:text-[var(--kura-text)] hover:bg-transparent"
-        >
-          ← Back
-        </Button>
-
         <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_0.65fr] gap-8 lg:gap-10">
           <section>
             <h1 className="text-3xl font-semibold tracking-tight text-[var(--kura-text)]">Plan & Billing</h1>

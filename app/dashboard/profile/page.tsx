@@ -69,9 +69,6 @@ export default function ProfilePage() {
     <div className="w-full pb-10 px-8 pt-10">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <Button onClick={() => router.back()} variant="ghost" className="mb-4 px-0 text-gray-400 hover:text-white hover:bg-transparent">
-            ← Back
-          </Button>
           <h1 className="text-3xl font-bold text-white">Profile Settings</h1>
           <p className="text-gray-400 mt-2">Manage your account information and preferences</p>
         </div>
@@ -151,7 +148,14 @@ export default function ProfilePage() {
         </Card>
 
         <div className="flex gap-3">
-          <Button onClick={() => router.back()} variant="outline">
+          <Button
+            onClick={() => {
+              setDisplayNameInput(userProfile.displayName);
+              setErrorMessage('');
+              setSuccessMessage('');
+            }}
+            variant="outline"
+          >
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={isLoading}>

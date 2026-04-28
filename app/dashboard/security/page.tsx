@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { useAppStore } from '@/store/useAppStore';
 
 export default function SecurityPage() {
-  const router = useRouter();
   const userEmail = useAppStore((state) => state.userProfile.email);
   const requestPasswordReset = useAppStore((state) => state.requestPasswordReset);
   const changePassword = useAppStore((state) => state.changePassword);
@@ -81,13 +79,6 @@ export default function SecurityPage() {
     <div className="w-full pb-10 px-8 pt-10">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <Button
-            onClick={() => router.back()}
-            variant="ghost"
-            className="mb-4 px-0 text-[var(--kura-text-secondary)] hover:text-[var(--kura-text)] hover:bg-transparent"
-          >
-            ← Back
-          </Button>
           <h1 className="text-3xl font-bold text-[var(--kura-text)]">Security Settings</h1>
           <p className="text-[var(--kura-text-secondary)] mt-2">Manage your password security settings</p>
         </div>

@@ -70,11 +70,15 @@ export default function AppSidebar() {
           </div>
         </>
       ) : (
-        <div className="space-y-2">
-          {settingsLinks.map((link) => (
-            <NavLink key={link.href} href={link.href} label={link.label} isActive={isActive(link.href)} />
-          ))}
-        </div>
+        <>
+          <NavLink href="/dashboard" label="<- Sidebar" isActive={false} />
+          <Separator className="my-3" />
+          <div className="space-y-2">
+            {settingsLinks.map((link) => (
+              <NavLink key={link.href} href={link.href} label={link.label} isActive={isActive(link.href)} />
+            ))}
+          </div>
+        </>
       )}
     </nav>
   );
