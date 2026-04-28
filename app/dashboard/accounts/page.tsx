@@ -72,7 +72,6 @@ export default function AccountsPage() {
   const disconnectInvestmentAccount = useFinanceStore((state) => state.disconnectInvestmentAccount);
   const hydratePlaidFinanceData = useFinanceStore((state) => state.hydratePlaidFinanceData);
   const isBalanceHidden = useAppStore((state) => state.isBalanceHidden);
-  const membershipLabel = useAppStore((state) => state.userProfile.membershipLabel);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -330,11 +329,6 @@ export default function AccountsPage() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 min-w-0">
                     <p className="text-sm font-medium truncate">{row.displayName}</p>
-                    {membershipLabel && (
-                      <span className="text-[10px] leading-none px-2 py-1 rounded-full border border-[var(--kura-border)] text-[var(--kura-text-secondary)] bg-[var(--kura-bg-light)] whitespace-nowrap">
-                        {membershipLabel}
-                      </span>
-                    )}
                   </div>
                   <p className="text-xs text-[var(--kura-text-secondary)] truncate">
                     {row.typeLabel} – {row.institutionLabel}
