@@ -174,7 +174,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 xl:grid-cols-[1.2fr_1fr] gap-4 mb-6 w-full">
         <Card className="h-[26rem]">
           <CardHeader className="pb-3">
-            <CardDescription className="text-sm">Total Assets</CardDescription>
+            <CardDescription className="text-sm">Cash Flow</CardDescription>
             <div className="flex items-baseline gap-3 flex-wrap">
               <CardTitle className="text-2xl md:text-3xl xl:text-4xl">
                 {maskAmount(`$${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)}
@@ -223,7 +223,7 @@ export default function DashboardPage() {
                     }}
                     formatter={(value) => [
                       isBalanceHidden ? '••••••' : `$${(value as number).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-                      'Total Assets',
+                      'Cash Flow',
                     ]}
                     labelStyle={{ color: 'var(--kura-text-secondary)', fontSize: '11px' }}
                   />
