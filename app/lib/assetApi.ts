@@ -9,21 +9,30 @@ import { requestJson } from './httpClient';
 
 export interface AssetHistoryPoint {
   timestamp: string; // ISO 8601 時間字串
-  value: number;
-  name: string;
-  type: string;
+  cashFlow: number;
+  plaidInvestment: number;
+  cryptoSpot: number;
+  defiProtocol: number;
 }
 
-export interface AssetHistorySummary {
+export interface AssetSegmentSummary {
   minValue: number;
   maxValue: number;
   change: number;
   changePercent: number;
 }
 
+export interface AssetHistorySummary {
+  cashFlow: AssetSegmentSummary;
+  plaidInvestment: AssetSegmentSummary;
+  cryptoSpot: AssetSegmentSummary;
+  defiProtocol: AssetSegmentSummary;
+}
+
 export interface AssetHistoryResponse {
   userId: string;
-  totalAssets: number;
+  cashFlow?: number;
+  totalAssets?: number;
   lastRecordedTime: string | null;
   history: AssetHistoryPoint[];
   summary: AssetHistorySummary;

@@ -480,7 +480,7 @@ export const useFinanceStore = create<FinanceState>((set, get) => ({
 
       console.info('[FinanceStore] Asset history hydrated', {
         points: response.history.length,
-        change: response.summary.changePercent,
+        change: response.summary.cashFlow?.changePercent ?? 0,
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch asset history';

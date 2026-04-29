@@ -57,6 +57,9 @@ export default function DashboardPage() {
   }, [hydrateAssetHistory]);
 
   const chartData = useMemo(() => {
+    const toSafeNumber = (value: unknown): number => {
+      return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+    };
     const toUtcDateKey = (timestamp: string): string => {
       const date = new Date(timestamp);
       const year = date.getUTCFullYear();
@@ -79,8 +82,12 @@ export default function DashboardPage() {
     );
     const dailyValueByUtcDate = new Map<string, { value: number; timestamp: string }>();
     sortedHistory.forEach((point) => {
+      const pointRecord = point as unknown as {
+        cashFlow?: number;
+        value?: number; // backward compatibility for older encrypted cache
+      };
       dailyValueByUtcDate.set(toUtcDateKey(point.timestamp), {
-        value: point.value,
+        value: toSafeNumber(pointRecord.cashFlow ?? pointRecord.value),
         timestamp: point.timestamp,
       });
     });
@@ -106,7 +113,7 @@ export default function DashboardPage() {
     });
   }, [apiAssetHistory]);
 
-  const changePercent = assetHistorySummary?.changePercent ?? null;
+  const changePercent = assetHistorySummary?.cashFlow?.changePercent ?? null;
   const changePositive = changePercent !== null && changePercent >= 0;
   const placeholderWaveData = useMemo(
     () => [
@@ -121,40 +128,67 @@ export default function DashboardPage() {
     ],
     [],
   );
+  const latestAssetSnapshot = useMemo(() => {
+    if (apiAssetHistory.length === 0) {
+      return {
+        plaidInvestment: 0,
+        cryptoSpot: 0,
+        defiProtocol: 0,
+      };
+    }
+
+    const latest = [...apiAssetHistory].sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    )[0];
+    return {
+      plaidInvestment: latest.plaidInvestment ?? 0,
+      cryptoSpot: latest.cryptoSpot ?? 0,
+      defiProtocol: latest.defiProtocol ?? 0,
+    };
+  }, [apiAssetHistory]);
+
+  const formatAssetAmount = (amount: number): string => {
+    return `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const formatChange = (changePercentValue: number): string => {
+    return `${changePercentValue >= 0 ? '+' : ''}${changePercentValue.toFixed(2)}%`;
+  };
+
   const miniCards = useMemo(
     () => [
       {
         key: 'investment',
         title: 'Investment',
-        value: '$0.00',
-        change: '+0.00%',
-        changeVariant: 'success' as const,
-        description: 'Portfolio growth pending setup',
+        value: formatAssetAmount(latestAssetSnapshot.plaidInvestment),
+        change: formatChange(assetHistorySummary?.plaidInvestment?.changePercent ?? 0),
+        changeVariant: (assetHistorySummary?.plaidInvestment?.changePercent ?? 0) >= 0 ? 'success' as const : 'destructive' as const,
+        description: 'Tracked from connected investment accounts',
         actionLabel: 'View Details',
         gradientId: 'investmentAreaGradient',
       },
       {
         key: 'crypto',
         title: 'Crypto',
-        value: '$0.00',
-        change: '-0.00%',
-        changeVariant: 'destructive' as const,
-        description: 'Connect your Web3 wallet',
+        value: formatAssetAmount(latestAssetSnapshot.cryptoSpot),
+        change: formatChange(assetHistorySummary?.cryptoSpot?.changePercent ?? 0),
+        changeVariant: (assetHistorySummary?.cryptoSpot?.changePercent ?? 0) >= 0 ? 'success' as const : 'destructive' as const,
+        description: 'Spot balance from wallets and exchanges',
         actionLabel: 'Connect Wallet',
         gradientId: 'cryptoAreaGradient',
       },
       {
         key: 'defi',
         title: 'DeFi Protocol',
-        value: '$0.00',
-        change: '+0.00%',
-        changeVariant: 'success' as const,
-        description: 'Track your DeFi positions',
+        value: formatAssetAmount(latestAssetSnapshot.defiProtocol),
+        change: formatChange(assetHistorySummary?.defiProtocol?.changePercent ?? 0),
+        changeVariant: (assetHistorySummary?.defiProtocol?.changePercent ?? 0) >= 0 ? 'success' as const : 'destructive' as const,
+        description: 'Protocol positions and LP allocations',
         actionLabel: 'Add Protocol',
         gradientId: 'defiAreaGradient',
       },
     ],
-    [],
+    [assetHistorySummary, latestAssetSnapshot],
   );
 
   const maskAmount = (amountText: string): string => {

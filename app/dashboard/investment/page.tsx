@@ -208,10 +208,17 @@ export default function InvestmentPage() {
     [stockHoldings],
   );
   const trendData = useMemo(() => {
+    const toSafeNumber = (value: unknown): number => {
+      return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+    };
+
     return [...apiAssetHistory]
       .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
       .map((point) => ({
-        value: point.value,
+        value:
+          toSafeNumber(point.plaidInvestment) +
+          toSafeNumber(point.cryptoSpot) +
+          toSafeNumber(point.defiProtocol),
         label: new Date(point.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       }));
   }, [apiAssetHistory]);
