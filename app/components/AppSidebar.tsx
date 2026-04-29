@@ -37,6 +37,7 @@ export default function AppSidebar() {
     { href: '/dashboard/accounts', label: 'Accounts' },
     { href: '/dashboard/transactions', label: 'Transactions' },
     { href: '/dashboard/investment', label: 'Investment' },
+    { href: '/dashboard/crypto', label: 'Crypto' },
     { href: '/dashboard/defi-protocol', label: 'DeFi Protocol' },
     { href: '/dashboard/budget', label: 'Budget' },
     { href: '/dashboard/impermanent-loss', label: 'Impermanent Loss' },
@@ -58,13 +59,13 @@ export default function AppSidebar() {
           <NavLink href={dashboardLinks[0].href} label={dashboardLinks[0].label} isActive={isActive(dashboardLinks[0].href)} />
           <Separator className="my-3" />
           <div className="space-y-2 mb-3">
-            {dashboardLinks.slice(1, 5).map((link) => (
+            {dashboardLinks.slice(1, 6).map((link) => (
               <NavLink key={link.href} href={link.href} label={link.label} isActive={isActive(link.href)} />
             ))}
           </div>
           <Separator className="my-3" />
           <div className="space-y-2">
-            {dashboardLinks.slice(5).map((link) => (
+            {dashboardLinks.slice(6).map((link) => (
               <NavLink key={link.href} href={link.href} label={link.label} isActive={isActive(link.href)} />
             ))}
           </div>

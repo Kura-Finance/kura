@@ -98,7 +98,7 @@ export interface SRPLoginResult {
  * 3. /srp/verify（傳 sessionId, clientA, clientM1）→ 後端驗證 + 返回 M2
  * 4. step2.step3(M2) 驗證後端 proof
  *
- * 關鍵修正：只呼叫一次 step1，用真實 B 直接計算，A 與 M1 來自同一次 step2。
+ * fix：只呼叫一次 step1，用真實 B 直接計算，A 與 M1 來自同一次 step2。
  */
 export async function srpFullLogin(
   email: string,
