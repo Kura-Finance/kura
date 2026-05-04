@@ -16,6 +16,17 @@ export interface DeBankProtocolPosition {
   usdValue: number;
   chain?: string;
   logo: string;
+  assets: DeBankProtocolAsset[];
+}
+
+export interface DeBankProtocolAsset {
+  id: string;
+  symbol: string;
+  name: string;
+  amount: number;
+  price: number;
+  usdValue: number;
+  logo: string;
 }
 
 export interface DeBankPositionsResponse<T> {
@@ -87,6 +98,101 @@ function normalizeToken(raw: unknown): DeBankTokenPosition | null {
   return { id, symbol, name, amount, price, logo, chain };
 }
 
+function arrayOrEmpty<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
+function normalizeProtocolAsset(raw: unknown, fallbackId: string): DeBankProtocolAsset | null {
+  const token = toRecord(raw);
+  if (!token) return null;
+
+  const symbol = toStringValue(token.optimized_symbol ?? token.symbol, 'ASSET');
+  const name = toStringValue(token.name, symbol);
+  const amount = toNumber(token.amount ?? token.balance ?? token.raw_amount);
+  const price = toNumber(token.price ?? token.price_usd ?? token.usd_price);
+  const explicitUsd = toNumber(token.usd_value ?? token.net_usd_value ?? token.value);
+  const usdValue = explicitUsd > 0 ? explicitUsd : amount * price;
+  const id = toStringValue(token.id) || toStringValue(token.token_id) || `${fallbackId}-${symbol.toLowerCase()}`;
+  const logo =
+    toStringValue(token.logo_url) ||
+    toStringValue(token.logo) ||
+    'https://www.google.com/s2/favicons?domain=debank.com&sz=128';
+
+  return { id, symbol, name, amount, price, usdValue, logo };
+}
+
+function extractProtocolAssets(raw: Record<string, unknown>, protocolId: string): DeBankProtocolAsset[] {
+  const detail = toRecord(raw.detail);
+  const portfolioItems = [
+    ...arrayOrEmpty<unknown>(raw.portfolio_item_list),
+    ...arrayOrEmpty<unknown>(detail?.portfolio_item_list),
+  ];
+
+  const assetsFromPortfolio = portfolioItems.flatMap((item, itemIndex) => {
+    const itemRecord = toRecord(item);
+    if (!itemRecord) return [];
+    const itemDetail = toRecord(itemRecord.detail);
+
+    const tokenCandidates = [
+      ...arrayOrEmpty<unknown>(itemRecord.token_list),
+      ...arrayOrEmpty<unknown>(itemRecord.asset_list),
+      ...arrayOrEmpty<unknown>(itemRecord.supply_token_list),
+      ...arrayOrEmpty<unknown>(itemRecord.borrow_token_list),
+      ...arrayOrEmpty<unknown>(itemRecord.reward_token_list),
+      ...arrayOrEmpty<unknown>(itemDetail?.token_list),
+      ...arrayOrEmpty<unknown>(itemDetail?.asset_list),
+      ...arrayOrEmpty<unknown>(itemDetail?.supply_token_list),
+      ...arrayOrEmpty<unknown>(itemDetail?.borrow_token_list),
+      ...arrayOrEmpty<unknown>(itemDetail?.reward_token_list),
+    ];
+
+    const normalized = tokenCandidates
+      .map((token, tokenIndex) =>
+        normalizeProtocolAsset(token, `${protocolId}-item-${itemIndex}-asset-${tokenIndex}`),
+      )
+      .filter((asset): asset is DeBankProtocolAsset => Boolean(asset));
+
+    if (normalized.length > 0) {
+      return normalized;
+    }
+
+    const itemStats = toRecord(itemRecord.stats);
+    const fallbackName = toStringValue(itemRecord.name, 'Position');
+    const fallbackUsd = toNumber(itemStats?.asset_usd_value ?? itemStats?.net_usd_value ?? itemRecord.usd_value);
+    if (fallbackUsd <= 0) {
+      return [];
+    }
+
+    return [
+      {
+        id: `${protocolId}-item-${itemIndex}`,
+        symbol: fallbackName.toUpperCase(),
+        name: fallbackName,
+        amount: 0,
+        price: 0,
+        usdValue: fallbackUsd,
+        logo: 'https://www.google.com/s2/favicons?domain=debank.com&sz=128',
+      },
+    ];
+  });
+
+  if (assetsFromPortfolio.length > 0) {
+    return assetsFromPortfolio;
+  }
+
+  const directTokenCandidates = [
+    ...arrayOrEmpty<unknown>(raw.token_list),
+    ...arrayOrEmpty<unknown>(raw.asset_list),
+    ...arrayOrEmpty<unknown>(raw.supply_token_list),
+    ...arrayOrEmpty<unknown>(raw.borrow_token_list),
+    ...arrayOrEmpty<unknown>(raw.reward_token_list),
+  ];
+
+  return directTokenCandidates
+    .map((token, tokenIndex) => normalizeProtocolAsset(token, `${protocolId}-asset-${tokenIndex}`))
+    .filter((asset): asset is DeBankProtocolAsset => Boolean(asset));
+}
+
 function normalizeProtocol(raw: unknown): DeBankProtocolPosition | null {
   const protocol = toRecord(raw);
   if (!protocol) return null;
@@ -109,8 +215,9 @@ function normalizeProtocol(raw: unknown): DeBankProtocolPosition | null {
     toStringValue(protocol.logo_url) ||
     toStringValue(protocol.logo) ||
     'https://www.google.com/s2/favicons?domain=debank.com&sz=128';
+  const assets = extractProtocolAssets(protocol, id);
 
-  return { id, name, usdValue, chain, logo };
+  return { id, name, usdValue, chain, logo, assets };
 }
 
 export const fetchDeBankTokenPositions = async (
